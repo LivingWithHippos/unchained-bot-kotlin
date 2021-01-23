@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  unchained:
+    image: unchained:v1
+    container_name: unchained
+    environment:
+      - TELEGRAM_BOT_TOKEN=${BOT_TOKEN}
+      - PRIVATE_API_KEY=${API_KEY}
