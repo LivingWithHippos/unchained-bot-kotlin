@@ -5,8 +5,8 @@ plugins {
     kotlin("kapt") version "1.4.21"
 }
 
-group = "me.user"
-version = "1.0-SNAPSHOT"
+group = "com.github.livingwithhippos"
+version = "0.1"
 
 repositories {
     mavenCentral()
@@ -14,12 +14,7 @@ repositories {
     maven { url = uri("https://jitpack.io") }
 }
 
-
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-val ktlint by configurations.creating
+val ktlint: Configuration by configurations.creating
 
 dependencies {
 
@@ -61,6 +56,23 @@ dependencies {
     implementation ("com.squareup.okhttp3:logging-interceptor:$okhttpVersion")
 
     ktlint("com.pinterest:ktlint:$ktLintVersion")
+}
+
+tasks {
+
+    // creates a fat jar (with dependencies) for Docker, using ./gradlew Jar
+    withType<Jar> {
+
+        manifest.attributes["Main-Class"] = "com.github.livingwithhippos.unchained_bot.Main"
+
+        configurations["compileClasspath"].forEach { file: File ->
+            from(zipTree(file.absoluteFile))
+        }
+    }
+
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
 }
 
 // ktlint stuff
