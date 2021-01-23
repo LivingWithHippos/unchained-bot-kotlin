@@ -22,14 +22,16 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 object ApiFactory {
 
     fun provideOkHttpClient(): OkHttpClient {
-        // todo: remove in production
+        // remove in production
+        /*
         val logInterceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
+         */
 
         return OkHttpClient().newBuilder()
             // logs all the calls, removed in the release channel
-            .addInterceptor(logInterceptor)
+            // .addInterceptor(logInterceptor)
             // avoid issues with empty bodies on delete/put and 20x return codes
             .addInterceptor(EmptyBodyInterceptor)
             .build()
