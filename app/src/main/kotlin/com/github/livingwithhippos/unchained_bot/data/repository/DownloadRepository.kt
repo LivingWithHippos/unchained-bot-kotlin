@@ -1,4 +1,4 @@
-package com.github.livingwithhippos.unchained.data.repositoy
+package com.github.livingwithhippos.unchained_bot.data.repository
 
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadApiHelper
 import com.github.livingwithhippos.unchained_bot.data.repository.BaseRepository

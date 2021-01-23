@@ -6,7 +6,7 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.logging.LogLevel
 import com.github.kotlintelegrambot.network.fold
-import com.github.livingwithhippos.unchained.data.repositoy.DownloadRepository
+import com.github.livingwithhippos.unchained_bot.data.repository.DownloadRepository
 import com.github.livingwithhippos.unchained_bot.data.model.Stream
 import com.github.livingwithhippos.unchained_bot.data.model.TorrentItem
 import com.github.livingwithhippos.unchained_bot.data.model.UploadedTorrent
@@ -27,23 +27,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
-import okio.BufferedSource
-import okio.Okio
 import okio.buffer
 import okio.sink
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
-import java.io.FileInputStream
 import java.lang.NumberFormatException
 import kotlin.system.exitProcess
-
-/**
- * TODO: lista download
- * TODO: lista torrent
- */
 
 @KoinApiExtension
 class BotApplication : KoinComponent {

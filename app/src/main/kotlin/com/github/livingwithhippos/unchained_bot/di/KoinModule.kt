@@ -1,6 +1,6 @@
 package com.github.livingwithhippos.unchained_bot.di
 
-import com.github.livingwithhippos.unchained.data.repositoy.DownloadRepository
+import com.github.livingwithhippos.unchained_bot.data.repository.DownloadRepository
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadApiHelper
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadApiHelperImpl
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadsApi
