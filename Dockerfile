@@ -6,7 +6,10 @@ COPY --chown=gradle:gradle app /home/gradle/src
 WORKDIR /home/gradle/src
 RUN ./gradlew Jar
 
-FROM openjdk:16-slim
+# this image does not throw errors but it's more than double the size
+# FROM openjdk:16-slim
+
+FROM openjdk:11.0-jre-slim
 
 # set version
 ARG VERSION="0.1"
