@@ -63,7 +63,7 @@ tasks {
     // creates a fat jar (with dependencies) for Docker, using ./gradlew Jar
     withType<Jar> {
 
-        manifest.attributes["Main-Class"] = "com.github.livingwithhippos.unchained_bot.Main"
+        manifest.attributes["Main-Class"] = "com.github.livingwithhippos.unchained_bot.MainKt"
 
         configurations["compileClasspath"].forEach { file: File ->
             from(zipTree(file.absoluteFile))
