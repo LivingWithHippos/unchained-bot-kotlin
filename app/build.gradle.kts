@@ -64,6 +64,8 @@ tasks {
     withType<Jar> {
 
         manifest.attributes["Main-Class"] = "com.github.livingwithhippos.unchained_bot.MainKt"
+        // remove the version from the Jar to make it easier to launch in the Dockerfile
+        setProperty("archiveVersion","")
 
         configurations["compileClasspath"].forEach { file: File ->
             from(zipTree(file.absoluteFile))
