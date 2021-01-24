@@ -186,7 +186,12 @@ class BotApplication : KoinComponent {
                             }
                         }
                         link.isTorrent() -> {
-                            downloadTorrent(link)
+                            val loaded = downloadTorrent(link)
+                            if (loaded == true)
+                                bot.sendMessage(
+                                    chatId = message.chat.id,
+                                    text = "Uploading torrent to Real Debrid. Check its status with /torrents"
+                                )
                         }
                         else -> bot.sendMessage(
                             chatId = message.chat.id,
