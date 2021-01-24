@@ -18,6 +18,7 @@ import com.github.livingwithhippos.unchained_bot.data.repository.UserRepository
 import com.github.livingwithhippos.unchained_bot.utilities.isMagnet
 import com.github.livingwithhippos.unchained_bot.utilities.isTorrent
 import com.github.livingwithhippos.unchained_bot.utilities.isWebUrl
+import com.github.livingwithhippos.unchained_bot.utilities.runCommand
 import com.github.unchained_bot.unchained.data.model.DownloadItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,8 @@ class BotApplication : KoinComponent {
     // Environment variables
     private val botToken: String = getKoin().getProperty("TELEGRAM_BOT_TOKEN") ?: ""
     private val privateApiKey: String = getKoin().getProperty("PRIVATE_API_KEY") ?: ""
+    private val wgetArguments: String = getKoin().getProperty("WGET_ARGUMENTS") ?: "--no-verbose"
+
     // these are not useful for docker but for running it locally
     private val tempPath: String = getKoin().getProperty("TEMP_PATH") ?: "/tmp/"
     private val downloadsPath: String = getKoin().getProperty("DOWNLOADS_PATH") ?: "/downloads/"
@@ -63,6 +66,7 @@ class BotApplication : KoinComponent {
         /user - get Real Debrid user's information
         /torrents [number, default 5] - list the last torrents
         /downloads [number, default 5] - list the last downloads
+        /download [unrestricted link] - downloads the link on the directory of the server running the bot
         /unrestrict [url|magnet|torrent file link] - generate a download link. Magnet/Torrents will be queued, check their status with /torrents
         /transcode [real debrid file id] - transcode streaming links to various quality levels. Get the file id using unrestrict
     """.trimIndent()
@@ -230,6 +234,22 @@ class BotApplication : KoinComponent {
                         bot.sendMessage(
                             chatId = message.chat.id,
                             text = "Wrong or missing argument.\nUsage: /stream [real debrid file id]"
+                        )
+                }
+
+                command("download") {
+                    // todo: restrict link to real debrid urls?
+                    val link = args[0]
+                    if (link.isNotBlank() && link.isWebUrl()) {
+                        bot.sendMessage(
+                            chatId = message.chat.id,
+                            text = "Starting download"
+                        )
+                        "wget -P $downloadsPath $wgetArguments $link".runCommand()
+                    } else
+                        bot.sendMessage(
+                            chatId = message.chat.id,
+                            text = "Wrong or missing argument.\nUsage: /download [unrestricted link]"
                         )
                 }
 
