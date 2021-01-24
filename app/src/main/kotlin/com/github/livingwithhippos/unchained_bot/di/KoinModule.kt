@@ -1,6 +1,5 @@
 package com.github.livingwithhippos.unchained_bot.di
 
-import com.github.livingwithhippos.unchained_bot.data.repository.DownloadRepository
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadApiHelper
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadApiHelperImpl
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadsApi
@@ -17,6 +16,7 @@ import com.github.livingwithhippos.unchained_bot.data.remote.UserApi
 import com.github.livingwithhippos.unchained_bot.data.remote.UserApiHelper
 import com.github.livingwithhippos.unchained_bot.data.remote.UserApiHelperImpl
 import com.github.livingwithhippos.unchained_bot.data.repository.CredentialsRepository
+import com.github.livingwithhippos.unchained_bot.data.repository.DownloadRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.StreamingRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.TorrentsRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.UnrestrictRepository

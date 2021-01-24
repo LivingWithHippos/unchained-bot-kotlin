@@ -20,7 +20,13 @@ class CredentialsRepository(val moshi: Moshi) {
         return adapter.fromJson(credentials)
     }
 
-    fun insertCredentials(deviceCode: String, clientId: String?, clientSecret: String?, accessToken: String?, refreshToken: String?) {
+    fun insertCredentials(
+        deviceCode: String,
+        clientId: String?,
+        clientSecret: String?,
+        accessToken: String?,
+        refreshToken: String?
+    ) {
         val adapter: JsonAdapter<Credentials> = moshi.adapter(Credentials::class.java)
         val credentials = Credentials(deviceCode, clientId, clientSecret, accessToken, refreshToken)
         // val jsonWriter: JsonWriter = JsonWriter.of(Paths.get(CREDENTIALS_PATH).toFile().sink().buffer())
