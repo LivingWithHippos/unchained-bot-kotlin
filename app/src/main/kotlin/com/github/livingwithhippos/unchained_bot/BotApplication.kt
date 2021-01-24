@@ -158,56 +158,60 @@ class BotApplication : KoinComponent {
                 }
 
                 command("unrestrict") {
-                    val link = args[0]
-                    when {
-                        link.isWebUrl() -> {
-                            // todo: check if torrent files ends here or need their own check
-                            scope.launch {
-                                val downloadItem = unrestrictLink(link)
-                                if (downloadItem != null) {
-                                    val itemMessage: String = "*Name:* ${downloadItem.filename}\n" +
-                                            "*Size:* ${downloadItem.fileSize / 1024 / 1024} MB\n" +
-                                            if (downloadItem.streamable == 1) "*Streaming transcoding available using /transcode ${downloadItem.id}*\n" else "*Streaming not available*\n" +
-                                                    "*Link:* ${downloadItem.download}"
+                    if (args.isNotEmpty()) {
+                        val link = args[0]
+                        when {
+                            link.isWebUrl() -> {
+                                scope.launch {
+                                    val downloadItem = unrestrictLink(link)
+                                    if (downloadItem != null) {
+                                        val itemMessage: String = "*Name:* ${downloadItem.filename}\n" +
+                                                "*Size:* ${downloadItem.fileSize / 1024 / 1024} MB\n" +
+                                                if (downloadItem.streamable == 1) "*Streaming transcoding available using /transcode ${downloadItem.id}*\n" else "*Streaming not available*\n" +
+                                                        "*Link:* ${downloadItem.download}"
 
-                                    bot.sendMessage(
-                                        chatId = message.chat.id,
-                                        text = itemMessage,
-                                        parseMode = ParseMode.MARKDOWN
-                                    )
+                                        bot.sendMessage(
+                                            chatId = message.chat.id,
+                                            text = itemMessage,
+                                            parseMode = ParseMode.MARKDOWN
+                                        )
+                                    }
                                 }
                             }
-                        }
-                        link.isMagnet() -> {
-                            // todo: add torrent repo and queue magnet with automatic file selection
-                            scope.launch {
-                                val addedMagnet: UploadedTorrent? = addMagnet(link)
-                                if (addedMagnet != null) {
-                                    val magnetMessage =
-                                        "Added torrent with id ${addedMagnet.id}, check its status with /torrents"
+                            link.isMagnet() -> {
+                                scope.launch {
+                                    val addedMagnet: UploadedTorrent? = addMagnet(link)
+                                    if (addedMagnet != null) {
+                                        val magnetMessage =
+                                            "Added torrent with id ${addedMagnet.id}, check its status with /torrents"
 
-                                    bot.sendMessage(
-                                        chatId = message.chat.id,
-                                        text = magnetMessage
-                                    )
+                                        bot.sendMessage(
+                                            chatId = message.chat.id,
+                                            text = magnetMessage
+                                        )
 
-                                    fetchTorrentInfo(addedMagnet.id)
+                                        fetchTorrentInfo(addedMagnet.id)
+                                    }
                                 }
                             }
+                            link.isTorrent() -> {
+                                val loaded = downloadTorrent(link)
+                                if (loaded == true)
+                                    bot.sendMessage(
+                                        chatId = message.chat.id,
+                                        text = "Uploading torrent to Real Debrid. Check its status with /torrents"
+                                    )
+                            }
+                            else -> bot.sendMessage(
+                                chatId = message.chat.id,
+                                text = "Wrong or missing argument.\nUsage: /unrestrict [url|magnet|torrent file link]"
+                            )
                         }
-                        link.isTorrent() -> {
-                            val loaded = downloadTorrent(link)
-                            if (loaded == true)
-                                bot.sendMessage(
-                                    chatId = message.chat.id,
-                                    text = "Uploading torrent to Real Debrid. Check its status with /torrents"
-                                )
-                        }
-                        else -> bot.sendMessage(
+                    } else
+                        bot.sendMessage(
                             chatId = message.chat.id,
                             text = "Wrong or missing argument.\nUsage: /unrestrict [url|magnet|torrent file link]"
                         )
-                    }
                 }
 
                 command("transcode") {
@@ -282,7 +286,7 @@ class BotApplication : KoinComponent {
                             )
                             stringBuilder.append("\n")
                             if (it.links.isNotEmpty()) {
-                                stringBuilder.append("Download these files with /unrestrict:\n")
+                                stringBuilder.append("*Download these files with /unrestrict:*\n")
                                 it.links.forEach { link ->
                                     stringBuilder.append(link + "\n")
                                 }
