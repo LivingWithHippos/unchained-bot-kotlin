@@ -6,12 +6,11 @@ import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.logging.LogLevel
 import com.github.kotlintelegrambot.network.fold
-import com.github.livingwithhippos.unchained_bot.data.repository.DownloadRepository
 import com.github.livingwithhippos.unchained_bot.data.model.Stream
 import com.github.livingwithhippos.unchained_bot.data.model.TorrentItem
 import com.github.livingwithhippos.unchained_bot.data.model.UploadedTorrent
 import com.github.livingwithhippos.unchained_bot.data.model.User
-import com.github.livingwithhippos.unchained_bot.data.repository.CredentialsRepository
+import com.github.livingwithhippos.unchained_bot.data.repository.DownloadRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.StreamingRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.TorrentsRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.UnrestrictRepository
@@ -33,7 +32,6 @@ import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
-import java.lang.NumberFormatException
 import kotlin.system.exitProcess
 
 @KoinApiExtension
@@ -44,7 +42,6 @@ class BotApplication : KoinComponent {
     private val privateApiKey: String = getKoin().getProperty("PRIVATE_API_KEY") ?: ""
 
     // repositories
-    private val credentialsRepository: CredentialsRepository by inject()
     private val userRepository: UserRepository by inject()
     private val unrestrictRepository: UnrestrictRepository by inject()
     private val streamingRepository: StreamingRepository by inject()
@@ -85,8 +82,6 @@ class BotApplication : KoinComponent {
 
         println("Starting bot...")
 
-        // writeCredentialsFromEnvironment()
-
         val bot = bot {
 
             token = botToken
@@ -113,8 +108,8 @@ class BotApplication : KoinComponent {
                         val user = getUser()
                         if (user != null) {
                             val welcome = "Welcome back, ${user.username}\n" +
-                                "You have ${user.premium / 60 / 60 / 24} days of premium " +
-                                "and ${user.points} points remaining."
+                                    "You have ${user.premium / 60 / 60 / 24} days of premium " +
+                                    "and ${user.points} points remaining."
                             bot.sendMessage(chatId = message.chat.id, text = welcome)
                         } else
                         // close the bot?
@@ -135,13 +130,13 @@ class BotApplication : KoinComponent {
                         val user = getUser()
                         if (user != null) {
                             val information = "${user.avatar} \n" +
-                                "id: ${user.id}\n" +
-                                "username: ${user.username}\n" +
-                                "email: ${user.email}\n" +
-                                "points: ${user.points}\n" +
-                                "type: ${user.type}\n" +
-                                "premium: ${user.premium / 60 / 60 / 24} days\n" +
-                                "expiration: ${user.expiration}"
+                                    "id: ${user.id}\n" +
+                                    "username: ${user.username}\n" +
+                                    "email: ${user.email}\n" +
+                                    "points: ${user.points}\n" +
+                                    "type: ${user.type}\n" +
+                                    "premium: ${user.premium / 60 / 60 / 24} days\n" +
+                                    "expiration: ${user.expiration}"
 
                             bot.sendMessage(chatId = message.chat.id, text = information)
                         } else
@@ -161,9 +156,9 @@ class BotApplication : KoinComponent {
                                 val downloadItem = unrestrictLink(link)
                                 if (downloadItem != null) {
                                     val itemMessage: String = "*Name:* ${downloadItem.filename}\n" +
-                                        "*Size:* ${downloadItem.fileSize / 1024 / 1024} MB\n" +
-                                        if (downloadItem.streamable == 1) "*Streaming transcoding available using /transcode ${downloadItem.id}*\n" else "*Streaming not available*\n" +
-                                            "*Link:* ${downloadItem.download}"
+                                            "*Size:* ${downloadItem.fileSize / 1024 / 1024} MB\n" +
+                                            if (downloadItem.streamable == 1) "*Streaming transcoding available using /transcode ${downloadItem.id}*\n" else "*Streaming not available*\n" +
+                                                    "*Link:* ${downloadItem.download}"
 
                                     bot.sendMessage(
                                         chatId = message.chat.id,
@@ -178,7 +173,8 @@ class BotApplication : KoinComponent {
                             scope.launch {
                                 val addedMagnet: UploadedTorrent? = addMagnet(link)
                                 if (addedMagnet != null) {
-                                    val magnetMessage = "Added torrent with id ${addedMagnet.id}, check its status with /torrents"
+                                    val magnetMessage =
+                                        "Added torrent with id ${addedMagnet.id}, check its status with /torrents"
 
                                     bot.sendMessage(
                                         chatId = message.chat.id,
@@ -240,7 +236,8 @@ class BotApplication : KoinComponent {
                                 text = "Couldn't recognize number, defaulting to 5.\nUsage: /torrents [number, default 5]"
                             )
                         }
-                        val torrents: List<TorrentItem> = torrentsRepository.getTorrentsList(privateApiKey,0,1, retrievedTorrents, null)
+                        val torrents: List<TorrentItem> =
+                            torrentsRepository.getTorrentsList(privateApiKey, 0, 1, retrievedTorrents, null)
                         val stringBuilder = StringBuilder()
                         torrents.forEach {
 
@@ -256,7 +253,7 @@ class BotApplication : KoinComponent {
                             if (it.links.isNotEmpty()) {
                                 stringBuilder.append("Download these files with /unrestrict:\n")
                                 it.links.forEach { link ->
-                                    stringBuilder.append(link+"\n")
+                                    stringBuilder.append(link + "\n")
                                 }
                             }
                             stringBuilder.append("\n")
@@ -283,7 +280,8 @@ class BotApplication : KoinComponent {
                                 text = "Couldn't recognize number, defaulting to 5.\nUsage: /downloads [number, default 5]"
                             )
                         }
-                        val downloads: List<DownloadItem> = downloadRepository.getDownloads(privateApiKey,limit = retrievedDownloads)
+                        val downloads: List<DownloadItem> =
+                            downloadRepository.getDownloads(privateApiKey, limit = retrievedDownloads)
                         val stringBuilder = StringBuilder()
                         downloads.forEach {
                             stringBuilder.append("*Name:*  ${it.filename}\n")
@@ -342,7 +340,7 @@ class BotApplication : KoinComponent {
         }
     }
 
-    private fun downloadTorrent(link: String): Boolean?{
+    private fun downloadTorrent(link: String): Boolean? {
         val downloadRequest: Request = Request.Builder().url(link).get().build()
 
         val response = okHttpClient.newCall(downloadRequest).execute()
@@ -351,7 +349,7 @@ class BotApplication : KoinComponent {
         }
         val source = response.body?.source()
         if (source != null) {
-            val path = TORRENTS_PATH+link.hashCode()+".torrent"
+            val path = TORRENTS_PATH + link.hashCode() + ".torrent"
             println("Writing torrent to $path")
             val file = File(path)
             val bufferedSink = file.sink().buffer()
@@ -375,7 +373,7 @@ class BotApplication : KoinComponent {
             val availableHosts = torrentsRepository.getAvailableHosts(privateApiKey)
             if (!availableHosts.isNullOrEmpty()) {
                 val uploadedTorrent = torrentsRepository.addTorrent(privateApiKey, buffer, availableHosts.first().host)
-                if (uploadedTorrent!=null)
+                if (uploadedTorrent != null)
                     fetchTorrentInfo(uploadedTorrent.id)
             }
         }
