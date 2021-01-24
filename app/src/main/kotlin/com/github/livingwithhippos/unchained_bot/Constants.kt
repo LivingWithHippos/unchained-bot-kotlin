@@ -17,7 +17,6 @@ const val GPLV3_URL = "https://www.gnu.org/licenses/gpl-3.0.en.html"
 const val PRIVATE_TOKEN: String = "private_token"
 
 const val CREDENTIALS_PATH = "./credentials.json"
-const val TORRENTS_PATH = "/tmp/"
 
 val errorMap = mapOf(
     -1 to "Internal error",

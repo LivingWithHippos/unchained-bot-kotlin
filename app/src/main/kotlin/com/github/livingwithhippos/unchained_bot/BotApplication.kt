@@ -40,6 +40,9 @@ class BotApplication : KoinComponent {
     // Environment variables
     private val botToken: String = getKoin().getProperty("TELEGRAM_BOT_TOKEN") ?: ""
     private val privateApiKey: String = getKoin().getProperty("PRIVATE_API_KEY") ?: ""
+    // these are not useful for docker but for running it locally
+    private val tempPath: String = getKoin().getProperty("TEMP_PATH") ?: "/tmp/"
+    private val downloadsPath: String = getKoin().getProperty("DOWNLOADS_PATH") ?: "/downloads/"
 
     // repositories
     private val userRepository: UserRepository by inject()
@@ -79,6 +82,9 @@ class BotApplication : KoinComponent {
             println("[ERROR] Wrong or missing real Real Debrid key.\nCheck your Real Debrid API Key and add it with the syntax PRIVATE_API_KEY=...")
             exitProcess(1)
         }
+
+        // check temp and downloads folder
+        checkAndMakeDirectories(tempPath, downloadsPath)
 
         println("Starting bot...")
 
@@ -310,6 +316,15 @@ class BotApplication : KoinComponent {
         println("Bot started")
     }
 
+    private fun checkAndMakeDirectories(vararg paths: String) {
+        // todo: add checks if path is file and if path is writeable
+        paths.forEach {
+            val directory = File(it)
+            if (!directory.exists())
+                directory.mkdir()
+        }
+    }
+
     private suspend fun getUser(): User? {
         return userRepository.getUserInfo(privateApiKey)
     }
@@ -354,8 +369,8 @@ class BotApplication : KoinComponent {
         }
         val source = response.body?.source()
         if (source != null) {
-            val path = TORRENTS_PATH + link.hashCode() + ".torrent"
-            println("Writing torrent to $path")
+            val path = if (tempPath.endsWith("/")) tempPath else tempPath.plus("/") + link.hashCode() + ".torrent"
+            println("Saving torrent file")
             val file = File(path)
             val bufferedSink = file.sink().buffer()
             bufferedSink.writeAll(source)
