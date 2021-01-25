@@ -32,7 +32,7 @@ object ApiFactory {
             // logs all the calls, removed in the release channel
             // .addInterceptor(logInterceptor)
             // avoid issues with empty bodies on delete/put and 20x return codes
-            .addInterceptor(EmptyBodyInterceptor)
+            //.addInterceptor(EmptyBodyInterceptor)
             .build()
     }
 

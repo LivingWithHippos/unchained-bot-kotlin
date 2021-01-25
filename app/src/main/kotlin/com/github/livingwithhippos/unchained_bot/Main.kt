@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
         // enable Printlogger with default Level.INFO
         // can have Level & implementation
         // equivalent to logger(Level.DEBUG, PrintLogger())
-        printLogger(Level.DEBUG)
+        printLogger(Level.ERROR)
 
         // declare properties from given map
         // properties()

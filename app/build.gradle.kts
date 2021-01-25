@@ -53,7 +53,7 @@ dependencies {
     //okhttp
     implementation ("com.squareup.okhttp3:okhttp:$okhttpVersion")
     //okhttp logging
-    implementation ("com.squareup.okhttp3:logging-interceptor:$okhttpVersion")
+    // implementation ("com.squareup.okhttp3:logging-interceptor:$okhttpVersion")
 
     ktlint("com.pinterest:ktlint:$ktLintVersion")
 }

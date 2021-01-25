@@ -42,6 +42,7 @@ class BotApplication : KoinComponent {
     private val botToken: String = getKoin().getProperty("TELEGRAM_BOT_TOKEN") ?: ""
     private val privateApiKey: String = getKoin().getProperty("PRIVATE_API_KEY") ?: ""
     private val wgetArguments: String = getKoin().getProperty("WGET_ARGUMENTS") ?: "--no-verbose"
+    private val logLevelArgument: String = getKoin().getProperty("LOG_LEVEL") ?: "error"
 
     // these are not useful for docker but for running it locally
     private val tempPath: String = getKoin().getProperty("TEMP_PATH") ?: "/tmp/"
@@ -96,8 +97,11 @@ class BotApplication : KoinComponent {
 
             token = botToken
             timeout = 30
-            logLevel = LogLevel.Error
-            // LogLevel.Network.Body
+            logLevel = when(logLevelArgument) {
+                "error" -> LogLevel.Error
+                "body" -> LogLevel.Network.Body
+                else -> LogLevel.Error
+            }
 
             dispatch {
 
@@ -131,7 +135,7 @@ class BotApplication : KoinComponent {
                 }
 
                 command("help") {
-                    bot.sendMessage(chatId = message.chat.id, text = helpMessage)
+                    bot.sendMessage(chatId = message.chat.id, text = helpMessage, parseMode = ParseMode.MARKDOWN)
                 }
 
                 command("user") {
@@ -288,7 +292,8 @@ class BotApplication : KoinComponent {
                             if (it.links.isNotEmpty()) {
                                 stringBuilder.append("*Download these files with /unrestrict:*\n")
                                 it.links.forEach { link ->
-                                    stringBuilder.append(link + "\n")
+                                    stringBuilder.append(link)
+                                    stringBuilder.append("\n")
                                 }
                             }
                             stringBuilder.append("\n")
