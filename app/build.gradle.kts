@@ -52,7 +52,7 @@ dependencies {
 
     //okhttp
     implementation ("com.squareup.okhttp3:okhttp:$okhttpVersion")
-    //okhttp logging
+    //okhttp logging. It's already used by the telegram bot library and can be set with Loglevel.Network
     // implementation ("com.squareup.okhttp3:logging-interceptor:$okhttpVersion")
 
     ktlint("com.pinterest:ktlint:$ktLintVersion")

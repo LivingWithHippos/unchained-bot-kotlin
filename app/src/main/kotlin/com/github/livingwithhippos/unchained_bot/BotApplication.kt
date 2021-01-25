@@ -100,6 +100,9 @@ class BotApplication : KoinComponent {
             logLevel = when(logLevelArgument) {
                 "error" -> LogLevel.Error
                 "body" -> LogLevel.Network.Body
+                "basic" -> LogLevel.Network.Basic
+                "headers" -> LogLevel.Network.Headers
+                "none" -> LogLevel.Network.None
                 else -> LogLevel.Error
             }
 
@@ -398,7 +401,7 @@ class BotApplication : KoinComponent {
         }
         val source = response.body?.source()
         if (source != null) {
-            val path = if (tempPath.endsWith("/")) tempPath else tempPath.plus("/") + link.hashCode() + ".torrent"
+            val path = ( if (tempPath.endsWith("/")) tempPath else tempPath.plus("/") ) + link.hashCode() + ".torrent"
             println("Saving torrent file")
             val file = File(path)
             val bufferedSink = file.sink().buffer()
