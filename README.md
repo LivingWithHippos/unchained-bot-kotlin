@@ -6,6 +6,15 @@ Unchained Bot Kotlin is a [Telegram Bot](https://core.telegram.org/bots) that al
 
 My [previous bot](https://github.com/LivingWithHippos/unchained-bot) was written in Python, but I realized that since [Unchained for Android](https://github.com/LivingWithHippos/unchained-android) was much more completed and a telegram library for Kotlin was available I could port the application with minimal effort. In fact around 90% of the code is shared with Unchained for Android.
 
+- [unchained-bot-kotlin](#unchained-bot-kotlin)
+  * [Installation](#installation)
+    + [Docker (recommended)](#docker--recommended-)
+      - [Docker compose](#docker-compose)
+      - [Docker cli](#docker-cli)
+    + [As a Kotlin/java application](#as-a-kotlin-java-application)
+    + [Parameters](#parameters)
+  * [Available Commands](#available-commands)
+
 ## Installation
 
 ### Docker (recommended)
@@ -74,3 +83,20 @@ If you don't use docker or already have java installed, this file is just ~ 9 MB
 | -e LOG_LEVEL | default is error, if you have issues you can set this to another level like body, basic, headers, none |
 | -e TEMP_PATH | path where temporary files, such are `.torrent` files, are being downloaded. You probably won't change this. |
 | -e DOWNLOADS_PATH | the folder where files are downloaded with `/download`. If you're using docker just change the mounted folder instead: `/new/path:/downloads` |
+
+## Available Commands
+
+Parameters between [square brackets] are optional.
+
+| Parameter | Function |
+|---|---|
+| /help | display the list of available commands |
+| /user | get Real Debrid user's information |
+| /torrents [number, default 5] | list the last torrents |
+| /downloads [number, default 5] | list the last downloads |
+| /download unrestricted_link | downloads the link on the directory of the server running the bot |
+| /unrestrict url|magnet|torrent file link | generate a download link. Magnet/Torrents will be queued, check their status with /torrents |
+| /transcode real_debrid_file_id | transcode streaming links to various quality levels. Get the file id using /unrestrict |
+
+## Thanks, Mr. Unchained
+<a href="https://imgbb.com/"><img src="https://i.ibb.co/grzjQsT/Oliva.jpg" width=300 alt="Mr. Unchained" border="0"></a>
