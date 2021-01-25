@@ -7,3 +7,5 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=${BOT_TOKEN}
       - PRIVATE_API_KEY=${API_KEY}
+    volumes:
+      - ./downloads:/downloads
