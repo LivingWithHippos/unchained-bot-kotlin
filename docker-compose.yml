@@ -2,7 +2,7 @@ version: '3'
 
 services:
   unchained:
-    image: unchained:v1
+    image: livingwithhippos/unchainedbot:0.1
     container_name: unchained
     environment:
       - TELEGRAM_BOT_TOKEN=${BOT_TOKEN}
