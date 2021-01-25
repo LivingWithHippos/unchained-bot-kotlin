@@ -4,6 +4,7 @@ services:
   unchained:
     image: livingwithhippos/unchainedbot:0.1
     container_name: unchained
+    restart: unless-stopped
     environment:
       - TELEGRAM_BOT_TOKEN=${BOT_TOKEN}
       - PRIVATE_API_KEY=${API_KEY}
