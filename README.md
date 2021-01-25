@@ -4,7 +4,7 @@ Telegram Bot written in Kotlin for Real-Debrid.
 
 Unchained Bot Kotlin is a [Telegram Bot](https://core.telegram.org/bots) that allows you to interface with [Real-Debrid](https://real-debrid.com/). If you want to support me, you can instead click through [this referral link](http://real-debrid.com/?id=78841).
 
-My [previous bot](https://github.com/LivingWithHippos/unchained-bot) was written in Python, but I realized that since [Unchained for Android](https://github.com/LivingWithHippos/unchained-android) was much more completed and a telegram library for python was available I could port the application with minimal effort. In fact around 90% of the code is shared with Unchained for Android.
+My [previous bot](https://github.com/LivingWithHippos/unchained-bot) was written in Python, but I realized that since [Unchained for Android](https://github.com/LivingWithHippos/unchained-android) was much more completed and a telegram library for Kotlin was available I could port the application with minimal effort. In fact around 90% of the code is shared with Unchained for Android.
 
 ## Installation
 
@@ -50,7 +50,17 @@ docker run -d \
 
 ### As a Kotlin/java application
 
-After cloning the project, navigate to the `app` folder and run `./gradlew Jar`. This will generate the file `unchained-bot-kotlin/app/build/libs/unchained-bot-kotlin.jar`. You can also download the `unchained-bot-kotlin.jar` file from the release page. You can move the file somewhere and run the bot with `java -DTELEGRAM_BOT_TOKEN=your-token -DPRIVATE_API_KEY=your-key -DDOWNLOADS_PATH=your-download-folder -jar unchained-bot-kotlin.jar`
+After cloning the project, navigate to the `app` folder and run `./gradlew Jar`. This will generate the file `unchained-bot-kotlin/app/build/libs/unchained-bot-kotlin.jar`. You can also download the `unchained-bot-kotlin.jar` file from the release page.
+
+You can then move the file somewhere and run the bot with 
+
+```shell
+java \
+-DTELEGRAM_BOT_TOKEN=your-token \
+-DPRIVATE_API_KEY=your-key \
+-DDOWNLOADS_PATH=your-download-folder \
+-jar unchained-bot-kotlin.jar
+```
 
 If you don't use docker or already have java installed, this file is just ~ 9 MB.
 
