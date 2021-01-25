@@ -57,6 +57,11 @@ docker run -d \
   livingwithhippos/unchainedbot:0.1
 ```
 
+#### Other optional volumes
+
+It is possible to mount the log file for wget and the config file for wget.
+
+
 ### As a Kotlin/java application
 
 After cloning the project, navigate to the `app` folder and run `./gradlew Jar`. This will generate the file `unchained-bot-kotlin/app/build/libs/unchained-bot-kotlin.jar`. You can also download the `unchained-bot-kotlin.jar` file from the release page.
@@ -71,7 +76,9 @@ java \
 -jar unchained-bot-kotlin.jar
 ```
 
-If you don't use docker or already have java installed, this file is just ~ 9 MB.
+To use the `/download` command you need wget installed.
+
+If you don't use docker or already have java installed, this file is just ~ 9 MB. The docker image is around 230 MB.
 
 ### Parameters
 
