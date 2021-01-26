@@ -2,10 +2,10 @@ package com.github.livingwithhippos.unchained_bot
 
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
-import com.github.kotlintelegrambot.dispatcher.command
+import com.github.kotlintelegrambot.dispatcher.message
 import com.github.kotlintelegrambot.entities.ParseMode
+import com.github.kotlintelegrambot.extensions.filters.Filter
 import com.github.kotlintelegrambot.logging.LogLevel
-import com.github.kotlintelegrambot.network.fold
 import com.github.livingwithhippos.unchained_bot.data.model.Stream
 import com.github.livingwithhippos.unchained_bot.data.model.TorrentItem
 import com.github.livingwithhippos.unchained_bot.data.model.UploadedTorrent
@@ -43,6 +43,7 @@ class BotApplication : KoinComponent {
     private val privateApiKey: String = getKoin().getProperty("PRIVATE_API_KEY") ?: ""
     private val wgetArguments: String = getKoin().getProperty("WGET_ARGUMENTS") ?: "--no-verbose"
     private val logLevelArgument: String = getKoin().getProperty("LOG_LEVEL") ?: "error"
+    private val whitelistedUser: Long = getKoin().getProperty<String>("WHITELISTED_USER")?.toLongOrNull() ?: 0
 
     // these are not useful for docker but for running it locally
     private val tempPath: String = getKoin().getProperty("TEMP_PATH") ?: "/tmp/"
@@ -72,6 +73,21 @@ class BotApplication : KoinComponent {
         /transcode [real debrid file id] - transcode streaming links to various quality levels. Get the file id using unrestrict
     """.trimIndent()
 
+    // Filters
+    // Filter the whitelisted user, if any
+    private val userFilter = if (whitelistedUser > 10000) Filter.User(whitelistedUser) else Filter.All
+    // Command filters
+    private val startCommandFilter = Filter.Custom { text?.startsWith("/start") ?: false }
+    private val helpCommandFilter = Filter.Custom { text?.startsWith("/help") ?: false }
+    private val userCommandFilter = Filter.Custom { text?.startsWith("/user") ?: false }
+    private val unrestrictCommandFilter = Filter.Custom { text?.startsWith("/unrestrict") ?: false }
+    private val transcodeCommandFilter = Filter.Custom { text?.startsWith("/transcode ") ?: false }
+    // more complete check, otherwise text?.startsWith("/download") will also match /downloads
+    // necessary only for commands that have another commands starting with the same characters
+    private val downloadCommandFilter = Filter.Custom { (text?.split("\\s")?.firstOrNull() ?: "") == "/download" }
+    private val torrentsCommandFilter = Filter.Custom { text?.startsWith("/torrents") ?: false }
+    private val downloadsCommandFilter = Filter.Custom { ( text?.startsWith("/downloads") ?: false ) }
+
     init {
 
         if (botToken.length > 40)
@@ -97,7 +113,7 @@ class BotApplication : KoinComponent {
 
             token = botToken
             timeout = 30
-            logLevel = when(logLevelArgument) {
+            logLevel = when (logLevelArgument) {
                 "error" -> LogLevel.Error
                 "body" -> LogLevel.Network.Body
                 "basic" -> LogLevel.Network.Basic
@@ -108,18 +124,13 @@ class BotApplication : KoinComponent {
 
             dispatch {
 
-                command("start") {
+                message(helpCommandFilter and userFilter) {
+                    bot.sendMessage(chatId = message.chat.id, text = helpMessage, parseMode = ParseMode.MARKDOWN)
+                }
+
+                message(startCommandFilter and userFilter) {
 
                     val result = bot.sendMessage(chatId = update.message!!.chat.id, text = "Bot started")
-
-                    result.fold(
-                        {
-                            // do something here with the response
-                        },
-                        {
-                            // do something with the error
-                        }
-                    )
 
                     scope.launch {
                         val user = getUser()
@@ -137,11 +148,7 @@ class BotApplication : KoinComponent {
                     }
                 }
 
-                command("help") {
-                    bot.sendMessage(chatId = message.chat.id, text = helpMessage, parseMode = ParseMode.MARKDOWN)
-                }
-
-                command("user") {
+                message(userCommandFilter and userFilter) {
 
                     scope.launch {
                         val user = getUser()
@@ -164,7 +171,8 @@ class BotApplication : KoinComponent {
                     }
                 }
 
-                command("unrestrict") {
+                message(unrestrictCommandFilter and userFilter) {
+                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
                     if (args.isNotEmpty()) {
                         val link = args[0]
                         when {
@@ -203,7 +211,7 @@ class BotApplication : KoinComponent {
                             }
                             link.isTorrent() -> {
                                 val loaded = downloadTorrent(link)
-                                if (loaded == true)
+                                if (loaded)
                                     bot.sendMessage(
                                         chatId = message.chat.id,
                                         text = "Uploading torrent to Real Debrid. Check its status with /torrents"
@@ -221,7 +229,8 @@ class BotApplication : KoinComponent {
                         )
                 }
 
-                command("transcode") {
+                message(transcodeCommandFilter and userFilter) {
+                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
                     if (args[0].isNotBlank()) {
 
                         scope.launch {
@@ -248,15 +257,15 @@ class BotApplication : KoinComponent {
                         )
                 }
 
-                command("download") {
+                message(downloadCommandFilter and userFilter) {
+                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
                     // todo: restrict link to real debrid urls?
-                    val link = args[0]
-                    if (link.isNotBlank() && link.isWebUrl()) {
+                    if (args.isNotEmpty() && args[0].isNotBlank() && args[0].isWebUrl()) {
                         bot.sendMessage(
                             chatId = message.chat.id,
                             text = "Starting download"
                         )
-                        "wget -P $downloadsPath $wgetArguments $link".runCommand()
+                        "wget -P $downloadsPath $wgetArguments ${args[0]}".runCommand()
                     } else
                         bot.sendMessage(
                             chatId = message.chat.id,
@@ -264,7 +273,8 @@ class BotApplication : KoinComponent {
                         )
                 }
 
-                command("torrents") {
+                message(torrentsCommandFilter and userFilter) {
+                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
                     scope.launch {
                         var retrievedTorrents = 5
                         try {
@@ -309,7 +319,9 @@ class BotApplication : KoinComponent {
                     }
                 }
 
-                command("downloads") {
+
+                message(downloadsCommandFilter and userFilter) {
+                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
                     scope.launch {
                         var retrievedDownloads = 5
                         try {
@@ -340,6 +352,8 @@ class BotApplication : KoinComponent {
                         )
                     }
                 }
+
+                // end of message() filtering whitelisted user
             }
         }
 
@@ -392,16 +406,16 @@ class BotApplication : KoinComponent {
         }
     }
 
-    private fun downloadTorrent(link: String): Boolean? {
+    private fun downloadTorrent(link: String): Boolean {
         val downloadRequest: Request = Request.Builder().url(link).get().build()
 
         val response = okHttpClient.newCall(downloadRequest).execute()
         if (!response.isSuccessful) {
-            return null
+            return false
         }
         val source = response.body?.source()
         if (source != null) {
-            val path = ( if (tempPath.endsWith("/")) tempPath else tempPath.plus("/") ) + link.hashCode() + ".torrent"
+            val path = (if (tempPath.endsWith("/")) tempPath else tempPath.plus("/")) + link.hashCode() + ".torrent"
             println("Saving torrent file")
             val file = File(path)
             val bufferedSink = file.sink().buffer()
@@ -416,7 +430,7 @@ class BotApplication : KoinComponent {
 
             return true
         } else
-            return null
+            return false
     }
 
     private fun uploadTorrent(buffer: ByteArray) {

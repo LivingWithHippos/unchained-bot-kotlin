@@ -4,7 +4,7 @@ Telegram Bot written in Kotlin for Real-Debrid.
 
 Unchained Bot Kotlin is a [Telegram Bot](https://core.telegram.org/bots) that allows you to interface with [Real-Debrid](https://real-debrid.com/). If you want to support me, you can instead click through [this referral link](http://real-debrid.com/?id=78841).
 
-My [previous bot](https://github.com/LivingWithHippos/unchained-bot) was written in Python, but I realized that since [Unchained for Android](https://github.com/LivingWithHippos/unchained-android) was much more completed and a telegram library for Kotlin was available I could port the application with minimal effort. In fact around 90% of the code is shared with Unchained for Android.
+My [previous bot](https://github.com/LivingWithHippos/unchained-bot) was written in Python, but I realized that since [Unchained for Android](https://github.com/LivingWithHippos/unchained-android) was much more completed and a [telegram library for Kotlin](https://github.com/kotlin-telegram-bot/kotlin-telegram-bot) was available I could port the application with minimal effort. In fact around 90% of the code is shared with Unchained for Android.
 
 - [unchained-bot-kotlin](#unchained-bot-kotlin)
   * [Installation](#installation)
@@ -35,7 +35,11 @@ services:
       - TELEGRAM_BOT_TOKEN=${BOT_TOKEN}
       - PRIVATE_API_KEY=${API_KEY}
       # optional
+      # only let this user use the bot
+      # - WHITELISTED_USER=your telegram user id
+      # add arguments for wget, userd for /download
       # - WGET_ARGUMENTS=see https://www.gnu.org/software/wget/manual/wget.html, default is "--no-verbose"
+      # OkHttp log level
       # - LOG_LEVEL=availabel options are error, body, basic, headers, none. Default is error
     volumes:
       - ./downloads:/downloads
@@ -50,6 +54,7 @@ docker run -d \
   --name=unchainedbot \
   -e TELEGRAM_BOT_TOKEN=abc `#required` \
   -e PRIVATE_API_KEY=def `#required` \
+  -e WHITELISTED_USER= `#optional` \
   -e WGET_ARGUMENTS= `#optional` \
   -e LOG_LEVEL= `#optional` \
   -v ./downloads:/downloads \
@@ -62,7 +67,7 @@ docker run -d \
 It is possible to mount the log file for wget and the config file for wget.
 
 
-### As a Kotlin/java application
+### As a java application
 
 After cloning the project, navigate to the `app` folder and run `./gradlew Jar`. This will generate the file `unchained-bot-kotlin/app/build/libs/unchained-bot-kotlin.jar`. You can also download the `unchained-bot-kotlin.jar` file from the release page.
 
@@ -86,6 +91,7 @@ If you don't use docker or already have java installed, this file is just ~ 9 MB
 |---|---|
 | -e TELEGRAM_BOT_TOKEN | get your telegram token from https://core.telegram.org/bots#3-how-do-i-create-a-bot |
 | -e PRIVATE_API_KEY | get your private API key from https://real-debrid.com/apitoken |
+| -e WHITELISTED_USER | let only this user utilize the bot |
 | -e WGET_ARGUMENTS | wget is used to download files locally. Pass arguments to it with this |
 | -e LOG_LEVEL | default is error, if you have issues you can set this to another level like body, basic, headers, none |
 | -e TEMP_PATH | path where temporary files, such are `.torrent` files, are being downloaded. You probably won't change this. |
