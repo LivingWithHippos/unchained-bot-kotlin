@@ -19,7 +19,7 @@ My [previous bot](https://github.com/LivingWithHippos/unchained-bot) was written
 
 ### Docker (recommended)
 
-An official image is being worked on. At the moment is possible to clone the repository and build an image from the Dockerfile with `docker build -t livingwithhippos/unchainedbot:0.1 .` and run it with either docker cli o docker compose.
+An official image is available on [dockerhub](https://hub.docker.com/r/livingwithhippos/unchainedbotkotlin). It is also possible to clone the repository and build an image from the Dockerfile with `docker build -t livingwithhippos/unchainedbot:0.1 .` and run it with either docker cli o docker compose.
 
 #### Docker compose
 
@@ -28,7 +28,7 @@ version: '3'
 
 services:
   unchained:
-    image: livingwithhippos/unchainedbot:0.1
+    image: livingwithhippos/unchainedbotkotlin:latest
     container_name: unchainedbot
     restart: unless-stopped
     environment:
@@ -59,7 +59,7 @@ docker run -d \
   -e LOG_LEVEL= `#optional` \
   -v ./downloads:/downloads \
   --restart unless-stopped \
-  livingwithhippos/unchainedbot:0.1
+  livingwithhippos/unchainedbotkotlin:latest
 ```
 
 #### Other optional volumes
