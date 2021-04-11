@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.10"
-    kotlin("kapt") version "1.4.21"
+    kotlin("jvm") version "1.4.31"
+    kotlin("kapt") version "1.4.32"
 }
 
 group = "com.github.livingwithhippos"
@@ -18,14 +18,14 @@ val ktlint: Configuration by configurations.creating
 
 dependencies {
 
-    val kotlinVersion = "1.4.21"
-    val coroutinesVersion = "1.4.2"
     val telegramVersion = "6.0.2"
+    val kotlinVersion = "1.4.31"
+    val coroutinesVersion = "1.4.3"
     val moshiVersion = "1.11.0"
     val retrofitVersion = "2.9.0"
-    val okhttpVersion = "4.9.0"
+    val okhttpVersion = "4.9.1"
     val koinVersion = "2.2.2"
-    val ktLintVersion = "0.40.0"
+    val ktLintVersion = "0.41.0"
 
     // kotlin stdlib
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
