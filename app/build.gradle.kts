@@ -18,9 +18,9 @@ val ktlint: Configuration by configurations.creating
 
 dependencies {
 
-    val telegramVersion = "6.0.2"
     val kotlinVersion = "1.4.31"
     val coroutinesVersion = "1.4.3"
+    val telegramVersion = "6.0.4"
     val moshiVersion = "1.11.0"
     val retrofitVersion = "2.9.0"
     val okhttpVersion = "4.9.1"

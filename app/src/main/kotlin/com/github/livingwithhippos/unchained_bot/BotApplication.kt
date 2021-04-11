@@ -3,6 +3,7 @@ package com.github.livingwithhippos.unchained_bot
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.message
+import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.extensions.filters.Filter
 import com.github.kotlintelegrambot.logging.LogLevel
@@ -125,12 +126,12 @@ class BotApplication : KoinComponent {
             dispatch {
 
                 message(helpCommandFilter and userFilter) {
-                    bot.sendMessage(chatId = message.chat.id, text = helpMessage, parseMode = ParseMode.MARKDOWN)
+                    bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = helpMessage, parseMode = ParseMode.MARKDOWN)
                 }
 
                 message(startCommandFilter and userFilter) {
 
-                    val result = bot.sendMessage(chatId = update.message!!.chat.id, text = "Bot started")
+                    val result = bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = "Bot started")
 
                     scope.launch {
                         val user = getUser()
@@ -138,11 +139,11 @@ class BotApplication : KoinComponent {
                             val welcome = "Welcome back, ${user.username}\n" +
                                     "You have ${user.premium / 60 / 60 / 24} days of premium " +
                                     "and ${user.points} points remaining."
-                            bot.sendMessage(chatId = message.chat.id, text = welcome)
+                            bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = welcome)
                         } else
                         // close the bot?
                             bot.sendMessage(
-                                chatId = message.chat.id,
+                                chatId = ChatId.fromId(message.chat.id),
                                 text = "Couldn't load your real debrid data\nCheck your private api key."
                             )
                     }
@@ -162,10 +163,10 @@ class BotApplication : KoinComponent {
                                     "premium: ${user.premium / 60 / 60 / 24} days\n" +
                                     "expiration: ${user.expiration}"
 
-                            bot.sendMessage(chatId = message.chat.id, text = information)
+                            bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = information)
                         } else
                             bot.sendMessage(
-                                chatId = message.chat.id,
+                                chatId = ChatId.fromId(message.chat.id),
                                 text = "Couldn't load your real debrid user data\nCheck your private api key."
                             )
                     }
@@ -186,7 +187,7 @@ class BotApplication : KoinComponent {
                                                         "*Link:* ${downloadItem.download}"
 
                                         bot.sendMessage(
-                                            chatId = message.chat.id,
+                                            chatId = ChatId.fromId(message.chat.id),
                                             text = itemMessage,
                                             parseMode = ParseMode.MARKDOWN
                                         )
@@ -201,7 +202,7 @@ class BotApplication : KoinComponent {
                                             "Added torrent with id ${addedMagnet.id}, check its status with /torrents"
 
                                         bot.sendMessage(
-                                            chatId = message.chat.id,
+                                            chatId = ChatId.fromId(message.chat.id),
                                             text = magnetMessage
                                         )
 
@@ -213,18 +214,18 @@ class BotApplication : KoinComponent {
                                 val loaded = downloadTorrent(link)
                                 if (loaded)
                                     bot.sendMessage(
-                                        chatId = message.chat.id,
+                                        chatId = ChatId.fromId(message.chat.id),
                                         text = "Uploading torrent to Real Debrid. Check its status with /torrents"
                                     )
                             }
                             else -> bot.sendMessage(
-                                chatId = message.chat.id,
+                                chatId = ChatId.fromId(message.chat.id),
                                 text = "Wrong or missing argument.\nUsage: /unrestrict [url|magnet|torrent file link]"
                             )
                         }
                     } else
                         bot.sendMessage(
-                            chatId = message.chat.id,
+                            chatId = ChatId.fromId(message.chat.id),
                             text = "Wrong or missing argument.\nUsage: /unrestrict [url|magnet|torrent file link]"
                         )
                 }
@@ -244,7 +245,7 @@ class BotApplication : KoinComponent {
                                 """.trimIndent()
 
                                 bot.sendMessage(
-                                    chatId = message.chat.id,
+                                    chatId = ChatId.fromId(message.chat.id),
                                     text = streamsMessage,
                                     parseMode = ParseMode.MARKDOWN
                                 )
@@ -252,7 +253,7 @@ class BotApplication : KoinComponent {
                         }
                     } else
                         bot.sendMessage(
-                            chatId = message.chat.id,
+                            chatId = ChatId.fromId(message.chat.id),
                             text = "Wrong or missing argument.\nUsage: /stream [real debrid file id]"
                         )
                 }
@@ -262,13 +263,13 @@ class BotApplication : KoinComponent {
                     // todo: restrict link to real debrid urls?
                     if (args.isNotEmpty() && args[0].isNotBlank() && args[0].isWebUrl()) {
                         bot.sendMessage(
-                            chatId = message.chat.id,
+                            chatId = ChatId.fromId(message.chat.id),
                             text = "Starting download"
                         )
                         "wget -P $downloadsPath $wgetArguments ${args[0]}".runCommand()
                     } else
                         bot.sendMessage(
-                            chatId = message.chat.id,
+                            chatId = ChatId.fromId(message.chat.id),
                             text = "Wrong or missing argument.\nUsage: /download [unrestricted link]"
                         )
                 }
@@ -284,7 +285,7 @@ class BotApplication : KoinComponent {
                             }
                         } catch (e: NumberFormatException) {
                             bot.sendMessage(
-                                chatId = message.chat.id,
+                                chatId = ChatId.fromId(message.chat.id),
                                 text = "Couldn't recognize number, defaulting to 5.\nUsage: /torrents [number, default 5]"
                             )
                         }
@@ -312,7 +313,7 @@ class BotApplication : KoinComponent {
                             stringBuilder.append("\n")
                         }
                         bot.sendMessage(
-                            chatId = message.chat.id,
+                            chatId = ChatId.fromId(message.chat.id),
                             text = stringBuilder.toString(),
                             parseMode = ParseMode.MARKDOWN
                         )
@@ -331,7 +332,7 @@ class BotApplication : KoinComponent {
                             }
                         } catch (e: NumberFormatException) {
                             bot.sendMessage(
-                                chatId = message.chat.id,
+                                chatId = ChatId.fromId(message.chat.id),
                                 text = "Couldn't recognize number, defaulting to 5.\nUsage: /downloads [number, default 5]"
                             )
                         }
@@ -346,7 +347,7 @@ class BotApplication : KoinComponent {
                             stringBuilder.append("\n")
                         }
                         bot.sendMessage(
-                            chatId = message.chat.id,
+                            chatId = ChatId.fromId(message.chat.id),
                             text = stringBuilder.toString(),
                             parseMode = ParseMode.MARKDOWN
                         )
