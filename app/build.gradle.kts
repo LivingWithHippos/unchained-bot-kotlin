@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.livingwithhippos"
-version = "0.1"
+version = "0.2"
 
 repositories {
     mavenCentral()
@@ -36,8 +36,6 @@ dependencies {
 
     // Koin for Kotlin
     implementation ("io.insert-koin:koin-core:$koinVersion")
-    // Koin extended & experimental features
-    // implementation ("org.koin:koin-core-ext:$koinVersion")
 
     // telegram bot
     implementation ("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:$telegramVersion")
