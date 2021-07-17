@@ -30,13 +30,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.buffer
 import okio.sink
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
 import kotlin.system.exitProcess
 
-@KoinApiExtension
 class BotApplication : KoinComponent {
 
     // Environment variables

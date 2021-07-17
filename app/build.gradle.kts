@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.31"
-    kotlin("kapt") version "1.4.32"
+    kotlin("jvm") version "1.5.21"
+    kotlin("kapt") version "1.5.21"
 }
 
 group = "com.github.livingwithhippos"
@@ -18,13 +18,13 @@ val ktlint: Configuration by configurations.creating
 
 dependencies {
 
-    val kotlinVersion = "1.4.31"
-    val coroutinesVersion = "1.4.3"
+    val kotlinVersion = "1.5.21"
+    val coroutinesVersion = "1.5.1"
     val telegramVersion = "6.0.4"
-    val moshiVersion = "1.11.0"
+    val moshiVersion = "1.12.0"
     val retrofitVersion = "2.9.0"
     val okhttpVersion = "4.9.1"
-    val koinVersion = "2.2.2"
+    val koinVersion = "3.1.2"
     val ktLintVersion = "0.41.0"
 
     // kotlin stdlib
@@ -35,9 +35,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
     // Koin for Kotlin
-    implementation ("org.koin:koin-core:$koinVersion")
+    implementation ("io.insert-koin:koin-core:$koinVersion")
     // Koin extended & experimental features
-    implementation ("org.koin:koin-core-ext:$koinVersion")
+    // implementation ("org.koin:koin-core-ext:$koinVersion")
 
     // telegram bot
     implementation ("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:$telegramVersion")
@@ -70,10 +70,6 @@ tasks {
         configurations["compileClasspath"].forEach { file: File ->
             from(zipTree(file.absoluteFile))
         }
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
     }
 }
 

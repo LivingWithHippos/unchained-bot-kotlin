@@ -1,11 +1,10 @@
 package com.github.livingwithhippos.unchained_bot
 
 import com.github.livingwithhippos.unchained_bot.di.myModules
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
+import org.koin.environmentProperties
 
-@KoinApiExtension
 fun main(args: Array<String>) {
 
     val koinInstance = startKoin {
