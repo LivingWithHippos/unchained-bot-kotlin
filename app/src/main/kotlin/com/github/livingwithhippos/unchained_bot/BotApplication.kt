@@ -42,6 +42,7 @@ class BotApplication : KoinComponent {
     private val privateApiKey: String = getKoin().getProperty("PRIVATE_API_KEY") ?: ""
     private val wgetArguments: String = getKoin().getProperty("WGET_ARGUMENTS") ?: "--no-verbose"
     private val logLevelArgument: String = getKoin().getProperty("LOG_LEVEL") ?: "error"
+    private val enableQueriesArgument: Boolean = getKoin().getProperty("ENABLE_QUERIES") ?: false
     private val whitelistedUser: Long = getKoin().getProperty<String>("WHITELISTED_USER")?.toLongOrNull() ?: 0
 
     // these are not useful for docker but for running it locally
