@@ -31,13 +31,11 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
+          context: {{defaultContext}}:docker
           push: true
           tags: |
             livingwithhippos/unchainedbotkotlin:latest
             livingwithhippos/unchainedbotkotlin:${{ env.VERSION }}
-          build-args: |
-            arg1=value1
-            arg2=value2
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
