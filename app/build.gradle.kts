@@ -1,8 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.21"
-    kotlin("kapt") version "1.5.21"
+    kotlin("jvm") version "1.6.10"
+    kotlin("kapt") version "1.6.10"
+    application
 }
 
 group = "com.github.livingwithhippos"
@@ -10,7 +11,6 @@ version = "0.2"
 
 repositories {
     mavenCentral()
-    jcenter()
     maven { url = uri("https://jitpack.io") }
 }
 
@@ -18,14 +18,14 @@ val ktlint: Configuration by configurations.creating
 
 dependencies {
 
-    val kotlinVersion = "1.5.21"
-    val coroutinesVersion = "1.5.1"
-    val telegramVersion = "6.0.4"
-    val moshiVersion = "1.12.0"
+    val kotlinVersion = "1.6.10"
+    val coroutinesVersion = "1.6.0"
+    val telegramVersion = "6.0.6"
+    val moshiVersion = "1.13.0"
     val retrofitVersion = "2.9.0"
-    val okhttpVersion = "4.9.1"
-    val koinVersion = "3.1.2"
-    val ktLintVersion = "0.41.0"
+    val okhttpVersion = "4.9.3"
+    val koinVersion = "3.1.5"
+    val ktLintVersion = "0.43.2"
 
     // kotlin stdlib
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
