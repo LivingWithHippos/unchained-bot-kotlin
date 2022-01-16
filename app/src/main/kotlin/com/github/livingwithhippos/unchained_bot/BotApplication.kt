@@ -2,9 +2,12 @@ package com.github.livingwithhippos.unchained_bot
 
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
+import com.github.kotlintelegrambot.dispatcher.inlineQuery
 import com.github.kotlintelegrambot.dispatcher.message
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.ParseMode
+import com.github.kotlintelegrambot.entities.inlinequeryresults.InlineQueryResult
+import com.github.kotlintelegrambot.entities.inlinequeryresults.InputMessageContent
 import com.github.kotlintelegrambot.extensions.filters.Filter
 import com.github.kotlintelegrambot.logging.LogLevel
 import com.github.livingwithhippos.unchained_bot.data.model.Stream
@@ -42,7 +45,7 @@ class BotApplication : KoinComponent {
     private val privateApiKey: String = getKoin().getProperty("PRIVATE_API_KEY") ?: ""
     private val wgetArguments: String = getKoin().getProperty("WGET_ARGUMENTS") ?: "--no-verbose"
     private val logLevelArgument: String = getKoin().getProperty("LOG_LEVEL") ?: "error"
-    private val enableQueriesArgument: Boolean = getKoin().getProperty("ENABLE_QUERIES") ?: false
+    private val enableQueriesArgument: Boolean = getKoin().getProperty<String>("ENABLE_QUERIES").equals("true", true)
     private val whitelistedUser: Long = getKoin().getProperty<String>("WHITELISTED_USER")?.toLongOrNull() ?: 0
 
     // these are not useful for docker but for running it locally
@@ -76,17 +79,19 @@ class BotApplication : KoinComponent {
     // Filters
     // Filter the whitelisted user, if any
     private val userFilter = if (whitelistedUser > 10000) Filter.User(whitelistedUser) else Filter.All
+
     // Command filters
     private val startCommandFilter = Filter.Custom { text?.startsWith("/start") ?: false }
     private val helpCommandFilter = Filter.Custom { text?.startsWith("/help") ?: false }
     private val userCommandFilter = Filter.Custom { text?.startsWith("/user") ?: false }
     private val unrestrictCommandFilter = Filter.Custom { text?.startsWith("/unrestrict") ?: false }
     private val transcodeCommandFilter = Filter.Custom { text?.startsWith("/transcode ") ?: false }
+
     // more complete check, otherwise text?.startsWith("/download") will also match /downloads
     // necessary only for commands that have another commands starting with the same characters
     private val downloadCommandFilter = Filter.Custom { (text?.split("\\s")?.firstOrNull() ?: "") == "/download" }
     private val torrentsCommandFilter = Filter.Custom { text?.startsWith("/torrents") ?: false }
-    private val downloadsCommandFilter = Filter.Custom { ( text?.startsWith("/downloads") ?: false ) }
+    private val downloadsCommandFilter = Filter.Custom { (text?.startsWith("/downloads") ?: false) }
 
     init {
 
@@ -122,10 +127,15 @@ class BotApplication : KoinComponent {
                 else -> LogLevel.Error
             }
 
+            // todo: add message splitting for when message length is > 4096
             dispatch {
 
                 message(helpCommandFilter and userFilter) {
-                    bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = helpMessage, parseMode = ParseMode.MARKDOWN)
+                    bot.sendMessage(
+                        chatId = ChatId.fromId(message.chat.id),
+                        text = helpMessage,
+                        parseMode = ParseMode.MARKDOWN
+                    )
                 }
 
                 message(startCommandFilter and userFilter) {
@@ -180,10 +190,7 @@ class BotApplication : KoinComponent {
                                 scope.launch {
                                     val downloadItem = unrestrictLink(link)
                                     if (downloadItem != null) {
-                                        val itemMessage: String = "*Name:* ${downloadItem.filename}\n" +
-                                                "*Size:* ${downloadItem.fileSize / 1024 / 1024} MB\n" +
-                                                (if (downloadItem.streamable == 1) "*Streaming transcoding available using* `/transcode ${downloadItem.id}`\n" else "*Streaming not available*\n") +
-                                                        "*Link:* ${downloadItem.download}"
+                                        val itemMessage: String = formatDownloadItem(downloadItem)
 
                                         bot.sendMessage(
                                             chatId = ChatId.fromId(message.chat.id),
@@ -357,13 +364,51 @@ class BotApplication : KoinComponent {
                     }
                 }
 
-                // end of message() filtering whitelisted user
+                if (enableQueriesArgument) {
+                    // N.B: you need to enable the inlining with BotFather using `/setinline` to use this
+                    inlineQuery {
+                        val queryText = inlineQuery.query
+
+                        if (queryText.isBlank() or queryText.isEmpty()) return@inlineQuery
+
+                        if (!queryText.isWebUrl()) return@inlineQuery
+
+                        scope.launch {
+                            val downloadItem = unrestrictLink(queryText)
+                            if (downloadItem != null) {
+                                val itemMessage: String = formatDownloadItem(downloadItem)
+
+                                val inlineResults = listOf(
+                                    InlineQueryResult.Article(
+                                        id = "1",
+                                        title = "Unrestrict",
+                                        inputMessageContent = InputMessageContent.Text(
+                                            itemMessage,
+                                            parseMode = ParseMode.MARKDOWN
+                                        ),
+                                        description = "Unrestrict a single link"
+                                    )
+                                )
+
+                                bot.answerInlineQuery(inlineQuery.id, inlineResults)
+                            }
+                        }
+                    }
+                }
             }
         }
 
         bot.startPolling()
 
         println("Bot started")
+    }
+
+    private fun formatDownloadItem(item: DownloadItem): String {
+        return "*Name:* ${item.filename}\n" +
+                "*Size:* ${item.fileSize / 1024 / 1024} MB\n" +
+                (if (item.streamable == 1) "*Streaming transcoding available using* `/transcode ${item.id}`\n" else "*Streaming not available*\n") +
+                "*Link:* ${item.download}"
+
     }
 
     private fun checkAndMakeDirectories(vararg paths: String) {
