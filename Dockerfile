@@ -1,4 +1,4 @@
-FROM gradle:6.7-jdk AS build
+FROM gradle:7-jdk AS build
 
 # set version label
 ARG BUILD_DATE
@@ -17,7 +17,7 @@ RUN ./gradlew Jar
 # final image size ~ 230 MB
 # When built shows a warning due to a bug in java 11 fixed in 14.
 # Lates jre available atm https://hub.docker.com/_/openjdk?tab=tags&page=1&ordering=last_updated&name=jre
-FROM openjdk:11.0-jre-slim
+FROM openjdk:11-jre-slim
 
 RUN \
  echo "**** install runtime packages ****" && \
