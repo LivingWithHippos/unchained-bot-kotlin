@@ -303,9 +303,9 @@ class BotApplication : KoinComponent {
                             stringBuilder.append("\n")
                             if (it.links.isNotEmpty()) {
                                 if (it.links.size == 1) {
-                                    stringBuilder.append("*Download with* /unrestrict ${it.links.first()}\n")
+                                    stringBuilder.append("${localization.getDownloadLink} /unrestrict ${it.links.first()}\n")
                                 } else {
-                                    stringBuilder.append("*Download these files using /unrestrict:*\n")
+                                    stringBuilder.append("${localization.getDownloadLink} /unrestrict +\n")
                                     it.links.forEach { link ->
                                         stringBuilder.append(link)
                                         stringBuilder.append("\n")

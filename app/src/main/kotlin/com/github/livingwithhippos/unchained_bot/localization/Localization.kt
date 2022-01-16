@@ -22,6 +22,7 @@ interface Localization {
     val unrestrict: String
     val unrestrictDescription: String
     val startingDownload: String
+    val getDownloadLink: String
 }
 
 val localeMapping: Map<String, Localization> = mapOf(

@@ -52,4 +52,6 @@ object IT : Localization {
         get() = "Sblocca un singolo link"
     override val startingDownload: String
         get() = "Avviando il download"
+    override val getDownloadLink: String
+        get() = "Ottieni link per download con"
 }
