@@ -19,6 +19,10 @@ import com.github.livingwithhippos.unchained_bot.data.repository.StreamingReposi
 import com.github.livingwithhippos.unchained_bot.data.repository.TorrentsRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.UnrestrictRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.UserRepository
+import com.github.livingwithhippos.unchained_bot.localization.EN
+import com.github.livingwithhippos.unchained_bot.localization.IT
+import com.github.livingwithhippos.unchained_bot.localization.Localization
+import com.github.livingwithhippos.unchained_bot.localization.localeMapping
 import com.github.livingwithhippos.unchained_bot.utilities.isMagnet
 import com.github.livingwithhippos.unchained_bot.utilities.isTorrent
 import com.github.livingwithhippos.unchained_bot.utilities.isWebUrl
@@ -38,6 +42,7 @@ import org.koin.core.component.inject
 import java.io.File
 import kotlin.system.exitProcess
 
+
 class BotApplication : KoinComponent {
 
     // Environment variables
@@ -47,6 +52,9 @@ class BotApplication : KoinComponent {
     private val logLevelArgument: String = getKoin().getProperty("LOG_LEVEL") ?: "error"
     private val enableQueriesArgument: Boolean = getKoin().getProperty<String>("ENABLE_QUERIES").equals("true", true)
     private val whitelistedUser: Long = getKoin().getProperty<String>("WHITELISTED_USER")?.toLongOrNull() ?: 0
+    private val localeArgument: String = getKoin().getProperty<String>("LOCALE") ?: "en"
+
+    private val localization: Localization = localeMapping.getOrDefault(localeArgument, EN)
 
     // these are not useful for docker but for running it locally
     private val tempPath: String = getKoin().getProperty("TEMP_PATH") ?: "/tmp/"
@@ -64,17 +72,6 @@ class BotApplication : KoinComponent {
     // coroutines
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Default + job)
-
-    private val helpMessage = """
-        *Command list:*
-        /help - display the list of available commands
-        /user - get Real Debrid user's information
-        /torrents [number, default 5] - list the last torrents
-        /downloads [number, default 5] - list the last downloads
-        /download [unrestricted link] - downloads the link on the directory of the server running the bot
-        /unrestrict [url|magnet|torrent file link] - generate a download link. Magnet/Torrents will be queued, check their status with /torrents
-        /transcode [real debrid file id] - transcode streaming links to various quality levels. Get the file id using unrestrict
-    """.trimIndent()
 
     // Filters
     // Filter the whitelisted user, if any
@@ -133,7 +130,7 @@ class BotApplication : KoinComponent {
                 message(helpCommandFilter and userFilter) {
                     bot.sendMessage(
                         chatId = ChatId.fromId(message.chat.id),
-                        text = helpMessage,
+                        text = localization.helpMessage,
                         parseMode = ParseMode.MARKDOWN
                     )
                 }
