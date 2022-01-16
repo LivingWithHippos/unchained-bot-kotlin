@@ -1,6 +1,8 @@
 package com.github.livingwithhippos.unchained_bot.localization
 
 object EN : Localization {
+    override val progress: String
+        get() = "Progress"
     override val helpMessage: String
         get() = """
         *Command list:*
@@ -48,4 +50,6 @@ object EN : Localization {
         get() =  "Unrestrict"
     override val unrestrictDescription: String
         get() = "Unrestrict a single link"
+    override val startingDownload: String
+        get() = "Starting download"
 }

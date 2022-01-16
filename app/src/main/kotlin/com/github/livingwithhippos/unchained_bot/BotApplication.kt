@@ -273,7 +273,7 @@ class BotApplication : KoinComponent {
                     if (args.isNotEmpty() && args[0].isNotBlank() && args[0].isWebUrl()) {
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
-                            text = "Starting download"
+                            text = localization.startingDownload
                         )
                         "wget -P $downloadsPath $wgetArguments ${args[0]}".runCommand()
                     } else
@@ -305,10 +305,10 @@ class BotApplication : KoinComponent {
 
                             stringBuilder.append(
                                 """
-                                    *Name:*  ${it.filename}
-                                    *Size:*  ${it.bytes / 1024 / 1024} MB
-                                    *Status:*  ${it.status}
-                                    *Progress:* ${it.progress}%
+                                    *${localization.name}:*  ${it.filename}
+                                    *${localization.size}:*  ${it.bytes / 1024 / 1024} MB
+                                    *${localization.status}:*  ${it.status}
+                                    *${localization.progress}:* ${it.progress}%
                                 """.trimIndent()
                             )
                             stringBuilder.append("\n")

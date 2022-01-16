@@ -1,6 +1,7 @@
 package com.github.livingwithhippos.unchained_bot.localization
 
 interface Localization {
+    val progress: String
     val helpMessage: String
     val privateKeyError: String
     val botStarted: String
@@ -20,6 +21,7 @@ interface Localization {
     val welcomeMessage: String
     val unrestrict: String
     val unrestrictDescription: String
+    val startingDownload: String
 }
 
 val localeMapping: Map<String, Localization> = mapOf(
