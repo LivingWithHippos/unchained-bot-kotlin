@@ -325,20 +325,9 @@ class BotApplication : KoinComponent {
 
 
                 message(downloadsCommandFilter and userFilter) {
-                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
+                    val args = message.text?.split("\\s+".toRegex())?.drop(1)?.firstOrNull()?.toIntOrNull()
                     scope.launch {
-                        var retrievedDownloads = 5
-                        try {
-                            if (args.isNotEmpty()) {
-                                val temp = Integer.parseInt(args[0])
-                                retrievedDownloads = temp
-                            }
-                        } catch (e: NumberFormatException) {
-                            bot.sendMessage(
-                                chatId = ChatId.fromId(message.chat.id),
-                                text = "Couldn't recognize number, defaulting to 5.\nUsage: /downloads [number, default 5]"
-                            )
-                        }
+                        val retrievedDownloads = args ?: 5
                         val downloads: List<DownloadItem> =
                             downloadRepository.getDownloads(privateApiKey, limit = retrievedDownloads)
                         val stringBuilder = StringBuilder()
