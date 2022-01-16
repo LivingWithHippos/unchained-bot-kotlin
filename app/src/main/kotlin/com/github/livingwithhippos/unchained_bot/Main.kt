@@ -29,4 +29,5 @@ fun main(args: Array<String>) {
     }
 
     val botApp = BotApplication()
+    botApp.startBot()
 }

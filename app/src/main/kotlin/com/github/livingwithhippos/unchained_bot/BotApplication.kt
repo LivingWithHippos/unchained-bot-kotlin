@@ -89,7 +89,7 @@ class BotApplication : KoinComponent {
     private val torrentsCommandFilter = Filter.Custom { text?.startsWith("/torrents") ?: false }
     private val downloadsCommandFilter = Filter.Custom { (text?.startsWith("/downloads") ?: false) }
 
-    init {
+    fun startBot() {
 
         if (botToken.length > 40)
             println("Found Telegram Bot Token")
@@ -192,7 +192,8 @@ class BotApplication : KoinComponent {
                                 scope.launch {
                                     val downloadItem = unrestrictLink(args)
                                     if (downloadItem != null) {
-                                        val itemMessage: String = formatDownloadItem(downloadItem, allowTranscoding = true)
+                                        val itemMessage: String =
+                                            formatDownloadItem(downloadItem, allowTranscoding = true)
 
                                         bot.sendMessage(
                                             chatId = ChatId.fromId(message.chat.id),
