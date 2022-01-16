@@ -284,20 +284,9 @@ class BotApplication : KoinComponent {
                 }
 
                 message(torrentsCommandFilter and userFilter) {
-                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
+                    val args = message.text?.split("\\s+".toRegex())?.drop(1)?.firstOrNull()?.toIntOrNull()
                     scope.launch {
-                        var retrievedTorrents = 5
-                        try {
-                            if (args.isNotEmpty()) {
-                                val temp = Integer.parseInt(args[0])
-                                retrievedTorrents = temp
-                            }
-                        } catch (e: NumberFormatException) {
-                            bot.sendMessage(
-                                chatId = ChatId.fromId(message.chat.id),
-                                text = "Couldn't recognize number, defaulting to 5.\nUsage: /torrents [number, default 5]"
-                            )
-                        }
+                        val retrievedTorrents = args ?: 5
                         val torrents: List<TorrentItem> =
                             torrentsRepository.getTorrentsList(privateApiKey, 0, 1, retrievedTorrents, null)
                         val stringBuilder = StringBuilder()
