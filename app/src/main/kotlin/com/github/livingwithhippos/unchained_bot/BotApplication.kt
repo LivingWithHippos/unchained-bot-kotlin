@@ -206,8 +206,7 @@ class BotApplication : KoinComponent {
                                 scope.launch {
                                     val addedMagnet: UploadedTorrent? = addMagnet(args)
                                     if (addedMagnet != null) {
-                                        val magnetMessage =
-                                            "Added torrent with id ${addedMagnet.id}, check its status with /torrents"
+                                        val magnetMessage = localization.addedTorrent.replace("%id%", addedMagnet.id)
 
                                         bot.sendMessage(
                                             chatId = ChatId.fromId(message.chat.id),
@@ -223,18 +222,18 @@ class BotApplication : KoinComponent {
                                 if (loaded)
                                     bot.sendMessage(
                                         chatId = ChatId.fromId(message.chat.id),
-                                        text = "Uploading torrent to Real Debrid. Check its status with /torrents"
+                                        text = localization.uploadingTorrent
                                     )
                             }
                             else -> bot.sendMessage(
                                 chatId = ChatId.fromId(message.chat.id),
-                                text = "Wrong or missing argument.\nUsage: /unrestrict [url|magnet|torrent file link]"
+                                text = localization.wrongUnrestrictSyntax
                             )
                         }
                     } else
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
-                            text = "Wrong or missing argument.\nUsage: /unrestrict [url|magnet|torrent file link]"
+                            text = localization.wrongUnrestrictSyntax
                         )
                 }
 
@@ -246,10 +245,10 @@ class BotApplication : KoinComponent {
                             val streams: Stream? = streamLink(args)
                             if (streams != null) {
                                 val streamsMessage = """
-                                    Apple quality: ${streams.apple.link}
-                                    Dash quality: ${streams.dash.link}
-                                    liveMp4 quality: ${streams.liveMP4.link}
-                                    h264WebM quality: ${streams.h264WebM.link}
+                                    ${localization.appleQuality}: ${streams.apple.link}
+                                    ${localization.dashQuality}: ${streams.dash.link}
+                                    ${localization.liveMP4Quality}: ${streams.liveMP4.link}
+                                    ${localization.h264WebMQuality}: ${streams.h264WebM.link}
                                 """.trimIndent()
 
                                 bot.sendMessage(
@@ -262,23 +261,23 @@ class BotApplication : KoinComponent {
                     } else
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
-                            text = "Wrong or missing argument.\nUsage: /stream [real debrid file id]"
+                            text = localization.wrongStreamSyntax
                         )
                 }
 
                 message(downloadCommandFilter and userFilter) {
-                    val args = getArgsAsList(message.text)
+                    val args = getArgAsString(message.text)
                     // todo: restrict link to real debrid urls?
-                    if (args.isNotEmpty() && args.first().isNotBlank() && args.first().isWebUrl()) {
+                    if (!args.isNullOrBlank() && args.isWebUrl()) {
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
                             text = localization.startingDownload
                         )
-                        "wget -P $downloadsPath $wgetArguments ${args[0]}".runCommand()
+                        "wget -P $downloadsPath $wgetArguments $args".runCommand()
                     } else
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
-                            text = "Wrong or missing argument.\nUsage: /download [unrestricted link]"
+                            text = localization.wrongDownloadSyntax
                         )
                 }
 

@@ -23,6 +23,15 @@ interface Localization {
     val unrestrictDescription: String
     val startingDownload: String
     val getDownloadLink: String
+    val wrongDownloadSyntax: String
+    val wrongStreamSyntax: String
+    val wrongUnrestrictSyntax: String
+    val addedTorrent: String
+    val uploadingTorrent: String
+    val appleQuality: String
+    val dashQuality: String
+    val liveMP4Quality: String
+    val h264WebMQuality: String
 }
 
 val localeMapping: Map<String, Localization> = mapOf(

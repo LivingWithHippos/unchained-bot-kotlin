@@ -54,4 +54,22 @@ object EN : Localization {
         get() = "Starting download"
     override val getDownloadLink: String
         get() = "Get the download link with"
+    override val wrongDownloadSyntax: String
+        get() = "Wrong or missing argument.\nSyntax: /download [unrestricted link]"
+    override val wrongStreamSyntax: String
+        get() = "Wrong or missing argument.\nSyntax: /stream [real debrid file id]"
+    override val wrongUnrestrictSyntax: String
+        get() = "Wrong or missing argument.\nSyntax: /unrestrict [url|magnet|torrent file link]"
+    override val addedTorrent: String
+        get() = "Added torrent with id %id%, check its status with /torrents"
+    override val uploadingTorrent: String
+        get() = "Uploading torrent to Real Debrid. Check its status with /torrents"
+    override val appleQuality: String
+        get() = "Apple quality"
+    override val dashQuality: String
+        get() = "Dash quality"
+    override val liveMP4Quality: String
+        get() = "liveMp4 quality"
+    override val h264WebMQuality: String
+        get() = "h264WebM quality"
 }
