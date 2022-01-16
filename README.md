@@ -87,15 +87,17 @@ If you don't use docker or already have java installed, this file is just ~ 9 MB
 
 ### Parameters
 
-| Parameter | Function |
-|---|---|
-| -e TELEGRAM_BOT_TOKEN | get your telegram token from https://core.telegram.org/bots#3-how-do-i-create-a-bot |
-| -e PRIVATE_API_KEY | get your private API key from https://real-debrid.com/apitoken |
-| -e WHITELISTED_USER | let only this user utilize the bot |
-| -e WGET_ARGUMENTS | wget is used to download files locally. Pass arguments to it with this |
-| -e LOG_LEVEL | default is error, if you have issues you can set this to another level like body, basic, headers, none |
-| -e TEMP_PATH | path where temporary files, such are `.torrent` files, are being downloaded. You probably won't change this. |
-| -e DOWNLOADS_PATH | the folder where files are downloaded with `/download`. If you're using docker just change the mounted folder instead: `/new/path:/downloads` |
+| Parameter | Function                                                                                                                                                            |
+|---|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| TELEGRAM_BOT_TOKEN | Required. Get your telegram token from https://core.telegram.org/bots#3-how-do-i-create-a-bot                                                                       |
+| PRIVATE_API_KEY | Required. Get your private API key from https://real-debrid.com/apitoken                                                                                            |
+| WHITELISTED_USER | let only this user utilize the bot. Needs the user's telegram ID.                                                                                                   |
+| ENABLE_QUERIES | Lets you mention the bot with a `@botName link` syntax from any chat to unrestrict  a link. NOT RESTRICTED TO WHITELISTED USER!!! Values "true"or "false" (default) |
+| LOCALE | Set the current translation. The values "en" for english and "it" for italian are available                                                                         |
+| WGET_ARGUMENTS | wget is used to download files locally. Pass arguments to it with this                                                                                              |
+| LOG_LEVEL | default is error, if you have issues you can set this to another level like body, basic, headers, none (currently bugged, do not use)                               |
+| TEMP_PATH | path where temporary files, such are `.torrent` files, are being downloaded. You probably won't change this.                                                        |
+| DOWNLOADS_PATH | the folder where files are downloaded with `/download`. If you're using docker just change the mounted folder instead: `/new/path:/downloads`                       |
 
 ## Available Commands
 
