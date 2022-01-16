@@ -20,7 +20,6 @@ import com.github.livingwithhippos.unchained_bot.data.repository.TorrentsReposit
 import com.github.livingwithhippos.unchained_bot.data.repository.UnrestrictRepository
 import com.github.livingwithhippos.unchained_bot.data.repository.UserRepository
 import com.github.livingwithhippos.unchained_bot.localization.EN
-import com.github.livingwithhippos.unchained_bot.localization.IT
 import com.github.livingwithhippos.unchained_bot.localization.Localization
 import com.github.livingwithhippos.unchained_bot.localization.localeMapping
 import com.github.livingwithhippos.unchained_bot.utilities.isMagnet
@@ -115,6 +114,7 @@ class BotApplication : KoinComponent {
 
             token = botToken
             timeout = 30
+            // error when setting this, they need to update their OkHttp logging library
             logLevel = when (logLevelArgument) {
                 "error" -> LogLevel.Error
                 "body" -> LogLevel.Network.Body
@@ -137,20 +137,26 @@ class BotApplication : KoinComponent {
 
                 message(startCommandFilter and userFilter) {
 
-                    val result = bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = "Bot started")
+                    bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = localization.botStarted)
 
                     scope.launch {
                         val user = getUser()
                         if (user != null) {
-                            val welcome = "Welcome back, ${user.username}\n" +
-                                    "You have ${user.premium / 60 / 60 / 24} days of premium " +
-                                    "and ${user.points} points remaining."
+
+                            val welcome = localization.welcomeMessage.replace(
+                                "%username%", user.username
+                            ).replace(
+                                "%days%", (user.premium / 60 / 60 / 24).toString()
+                            ).replace(
+                                "%points%", user.points.toString()
+                            )
+
                             bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = welcome)
                         } else
                         // close the bot?
                             bot.sendMessage(
                                 chatId = ChatId.fromId(message.chat.id),
-                                text = "Couldn't load your real debrid data\nCheck your private api key."
+                                text = localization.privateKeyError
                             )
                     }
                 }
@@ -160,20 +166,20 @@ class BotApplication : KoinComponent {
                     scope.launch {
                         val user = getUser()
                         if (user != null) {
-                            val information = "${user.avatar} \n" +
-                                    "id: ${user.id}\n" +
-                                    "username: ${user.username}\n" +
-                                    "email: ${user.email}\n" +
-                                    "points: ${user.points}\n" +
-                                    "type: ${user.type}\n" +
-                                    "premium: ${user.premium / 60 / 60 / 24} days\n" +
-                                    "expiration: ${user.expiration}"
+                            val information = "${localization.username}: ${user.username}\n" +
+                                    "${localization.status}: ${user.type}\n" +
+                                    "${localization.email}: ${user.email}\n" +
+                                    "${localization.points}: ${user.points}\n" +
+                                    "${localization.premium}: ${user.premium / 60 / 60 / 24} ${localization.days}\n" +
+                                    "${localization.expiration}: ${user.expiration}" +
+                                    "${localization.id}: ${user.id}\n" +
+                                    "${user.avatar} \n"
 
                             bot.sendMessage(chatId = ChatId.fromId(message.chat.id), text = information)
                         } else
                             bot.sendMessage(
                                 chatId = ChatId.fromId(message.chat.id),
-                                text = "Couldn't load your real debrid user data\nCheck your private api key."
+                                text = localization.privateKeyError
                             )
                     }
                 }
@@ -187,7 +193,7 @@ class BotApplication : KoinComponent {
                                 scope.launch {
                                     val downloadItem = unrestrictLink(link)
                                     if (downloadItem != null) {
-                                        val itemMessage: String = formatDownloadItem(downloadItem)
+                                        val itemMessage: String = formatDownloadItem(downloadItem, allowTranscoding = true)
 
                                         bot.sendMessage(
                                             chatId = ChatId.fromId(message.chat.id),
@@ -322,7 +328,8 @@ class BotApplication : KoinComponent {
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
                             text = stringBuilder.toString(),
-                            parseMode = ParseMode.MARKDOWN
+                            parseMode = ParseMode.MARKDOWN,
+                            disableWebPagePreview = true
                         )
                     }
                 }
@@ -347,11 +354,9 @@ class BotApplication : KoinComponent {
                             downloadRepository.getDownloads(privateApiKey, limit = retrievedDownloads)
                         val stringBuilder = StringBuilder()
                         downloads.forEach {
-                            stringBuilder.append("*Name:*  ${it.filename}\n")
-                            stringBuilder.append("*Size:*  ${it.fileSize / 1024 / 1024} MB\n")
-                            stringBuilder.append(if (it.streamable == 1) "*Download/Streaming link:*  ${it.download}\n" else "*Download link:*  ${it.download}\n")
-                            stringBuilder.append(if (it.streamable == 1) "*Streaming transcoding available, use /transcode ${it.id}*\n" else "*Streaming not available*\n")
-                            stringBuilder.append("\n")
+                            stringBuilder.append(formatDownloadItem(it))
+                            stringBuilder.appendLine()
+                            stringBuilder.appendLine()
                         }
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
@@ -378,12 +383,12 @@ class BotApplication : KoinComponent {
                                 val inlineResults = listOf(
                                     InlineQueryResult.Article(
                                         id = "1",
-                                        title = "Unrestrict",
+                                        title = localization.unrestrict,
                                         inputMessageContent = InputMessageContent.Text(
                                             itemMessage,
                                             parseMode = ParseMode.MARKDOWN
                                         ),
-                                        description = "Unrestrict a single link"
+                                        description = localization.unrestrictDescription
                                     )
                                 )
 
@@ -397,14 +402,22 @@ class BotApplication : KoinComponent {
 
         bot.startPolling()
 
-        println("Bot started")
+        println(localization.botStarted)
     }
 
-    private fun formatDownloadItem(item: DownloadItem): String {
-        return "*Name:* ${item.filename}\n" +
-                "*Size:* ${item.fileSize / 1024 / 1024} MB\n" +
-                (if (item.streamable == 1) "*Streaming transcoding available using* `/transcode ${item.id}`\n" else "*Streaming not available*\n") +
-                "*Link:* ${item.download}"
+    private fun formatDownloadItem(item: DownloadItem, allowTranscoding: Boolean = false): String {
+        return "*${localization.name}:* ${item.filename}\n" +
+                "*${localization.size}:* ${item.fileSize / 1024 / 1024} MB\n" +
+                (
+                        if (allowTranscoding) {
+                            if (item.streamable == 1)
+                                "*${localization.transcodingInstructions}* `/transcode ${item.id}`\n"
+                            else
+                                "*${localization.streamingUnavailable}*\n"
+                        } else
+                            ""
+                        ) +
+                "*${localization.link}:* ${item.download}"
 
     }
 
