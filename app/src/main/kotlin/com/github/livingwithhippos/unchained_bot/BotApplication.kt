@@ -185,13 +185,12 @@ class BotApplication : KoinComponent {
                 }
 
                 message(unrestrictCommandFilter and userFilter) {
-                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
-                    if (args.isNotEmpty()) {
-                        val link = args[0]
+                    val args = getArgAsString(message.text)
+                    if (!args.isNullOrBlank()) {
                         when {
-                            link.isWebUrl() -> {
+                            args.isWebUrl() -> {
                                 scope.launch {
-                                    val downloadItem = unrestrictLink(link)
+                                    val downloadItem = unrestrictLink(args)
                                     if (downloadItem != null) {
                                         val itemMessage: String = formatDownloadItem(downloadItem, allowTranscoding = true)
 
@@ -203,9 +202,9 @@ class BotApplication : KoinComponent {
                                     }
                                 }
                             }
-                            link.isMagnet() -> {
+                            args.isMagnet() -> {
                                 scope.launch {
-                                    val addedMagnet: UploadedTorrent? = addMagnet(link)
+                                    val addedMagnet: UploadedTorrent? = addMagnet(args)
                                     if (addedMagnet != null) {
                                         val magnetMessage =
                                             "Added torrent with id ${addedMagnet.id}, check its status with /torrents"
@@ -219,8 +218,8 @@ class BotApplication : KoinComponent {
                                     }
                                 }
                             }
-                            link.isTorrent() -> {
-                                val loaded = downloadTorrent(link)
+                            args.isTorrent() -> {
+                                val loaded = downloadTorrent(args)
                                 if (loaded)
                                     bot.sendMessage(
                                         chatId = ChatId.fromId(message.chat.id),
@@ -240,11 +239,11 @@ class BotApplication : KoinComponent {
                 }
 
                 message(transcodeCommandFilter and userFilter) {
-                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
-                    if (args[0].isNotBlank()) {
+                    val args = getArgAsString(message.text)
+                    if (!args.isNullOrBlank()) {
 
                         scope.launch {
-                            val streams: Stream? = streamLink(args[0])
+                            val streams: Stream? = streamLink(args)
                             if (streams != null) {
                                 val streamsMessage = """
                                     Apple quality: ${streams.apple.link}
@@ -268,9 +267,9 @@ class BotApplication : KoinComponent {
                 }
 
                 message(downloadCommandFilter and userFilter) {
-                    val args = message.text?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
+                    val args = getArgsAsList(message.text)
                     // todo: restrict link to real debrid urls?
-                    if (args.isNotEmpty() && args[0].isNotBlank() && args[0].isWebUrl()) {
+                    if (args.isNotEmpty() && args.first().isNotBlank() && args.first().isWebUrl()) {
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
                             text = localization.startingDownload
@@ -284,7 +283,7 @@ class BotApplication : KoinComponent {
                 }
 
                 message(torrentsCommandFilter and userFilter) {
-                    val args = message.text?.split("\\s+".toRegex())?.drop(1)?.firstOrNull()?.toIntOrNull()
+                    val args = getArgAsInt(message.text)
                     scope.launch {
                         val retrievedTorrents = args ?: 5
                         val torrents: List<TorrentItem> =
@@ -325,7 +324,7 @@ class BotApplication : KoinComponent {
 
 
                 message(downloadsCommandFilter and userFilter) {
-                    val args = message.text?.split("\\s+".toRegex())?.drop(1)?.firstOrNull()?.toIntOrNull()
+                    val args = getArgAsInt(message.text)
                     scope.launch {
                         val retrievedDownloads = args ?: 5
                         val downloads: List<DownloadItem> =
@@ -384,12 +383,13 @@ class BotApplication : KoinComponent {
     }
 
     private fun formatDownloadItem(item: DownloadItem, allowTranscoding: Boolean = false): String {
+        //todo: add keyboard to launch transcoding instructions
         return "*${localization.name}:* ${item.filename}\n" +
                 "*${localization.size}:* ${item.fileSize / 1024 / 1024} MB\n" +
                 (
                         if (allowTranscoding) {
                             if (item.streamable == 1)
-                                "*${localization.transcodingInstructions}* `/transcode ${item.id}`\n"
+                                "${localization.transcodingInstructions} /transcode ${item.id}\n"
                             else
                                 "*${localization.streamingUnavailable}*\n"
                         } else
@@ -480,5 +480,17 @@ class BotApplication : KoinComponent {
                     fetchTorrentInfo(uploadedTorrent.id)
             }
         }
+    }
+
+    private fun getArgAsInt(args: String?): Int? {
+        return args?.split("\\s+".toRegex())?.drop(1)?.firstOrNull()?.toIntOrNull()
+    }
+
+    private fun getArgsAsList(args: String?): List<String> {
+        return args?.split("\\s+".toRegex())?.drop(1) ?: emptyList()
+    }
+
+    private fun getArgAsString(args: String?): String? {
+        return args?.split("\\s+".toRegex())?.drop(1)?.firstOrNull()
     }
 }
