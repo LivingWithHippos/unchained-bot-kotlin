@@ -2,7 +2,6 @@ package com.github.livingwithhippos.unchained_bot.di
 
 import com.github.livingwithhippos.unchained_bot.BASE_AUTH_URL
 import com.github.livingwithhippos.unchained_bot.BASE_URL
-import com.github.livingwithhippos.unchained_bot.data.model.EmptyBodyInterceptor
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadsApi
 import com.github.livingwithhippos.unchained_bot.data.remote.StreamingApi
 import com.github.livingwithhippos.unchained_bot.data.remote.TorrentsApi
@@ -32,7 +31,7 @@ object ApiFactory {
             // logs all the calls, removed in the release channel
             // .addInterceptor(logInterceptor)
             // avoid issues with empty bodies on delete/put and 20x return codes
-            //.addInterceptor(EmptyBodyInterceptor)
+            // .addInterceptor(EmptyBodyInterceptor)
             .build()
     }
 

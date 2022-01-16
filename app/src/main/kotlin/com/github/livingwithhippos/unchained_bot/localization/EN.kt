@@ -33,7 +33,7 @@ object EN : Localization {
     override val username: String
         get() = "username"
     override val email: String
-        get() =  "email"
+        get() = "email"
     override val points: String
         get() = "points"
     override val status: String
@@ -47,7 +47,7 @@ object EN : Localization {
     override val welcomeMessage: String
         get() = "Welcome back, %username%.\nYou have %days% days of premium\nand %points% points remaining."
     override val unrestrict: String
-        get() =  "Unrestrict"
+        get() = "Unrestrict"
     override val unrestrictDescription: String
         get() = "Unrestrict a single link"
     override val startingDownload: String

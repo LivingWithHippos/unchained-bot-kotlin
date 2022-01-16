@@ -41,7 +41,6 @@ import org.koin.core.component.inject
 import java.io.File
 import kotlin.system.exitProcess
 
-
 class BotApplication : KoinComponent {
 
     // Environment variables
@@ -322,7 +321,6 @@ class BotApplication : KoinComponent {
                     }
                 }
 
-
                 message(downloadsCommandFilter and userFilter) {
                     val args = getArgAsInt(message.text)
                     scope.launch {
@@ -383,7 +381,7 @@ class BotApplication : KoinComponent {
     }
 
     private fun formatDownloadItem(item: DownloadItem, allowTranscoding: Boolean = false): String {
-        //todo: add keyboard to launch transcoding instructions
+        // todo: add keyboard to launch transcoding instructions
         return "*${localization.name}:* ${item.filename}\n" +
                 "*${localization.size}:* ${item.fileSize / 1024 / 1024} MB\n" +
                 (
@@ -396,7 +394,6 @@ class BotApplication : KoinComponent {
                             ""
                         ) +
                 "*${localization.link}:* ${item.download}"
-
     }
 
     private fun checkAndMakeDirectories(vararg paths: String) {

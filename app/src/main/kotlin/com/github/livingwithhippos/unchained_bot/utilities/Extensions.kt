@@ -71,7 +71,7 @@ fun String.runCommandWithOutput(workingDir: File): String? {
 
         proc.waitFor(60, TimeUnit.MINUTES)
         return proc.inputStream.bufferedReader().readText()
-    } catch(e: IOException) {
+    } catch (e: IOException) {
         e.printStackTrace()
         return null
     }
