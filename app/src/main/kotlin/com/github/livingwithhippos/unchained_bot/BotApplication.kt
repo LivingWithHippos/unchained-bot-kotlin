@@ -26,7 +26,7 @@ import com.github.livingwithhippos.unchained_bot.utilities.isMagnet
 import com.github.livingwithhippos.unchained_bot.utilities.isTorrent
 import com.github.livingwithhippos.unchained_bot.utilities.isWebUrl
 import com.github.livingwithhippos.unchained_bot.utilities.runCommand
-import com.github.unchained_bot.unchained.data.model.DownloadItem
+import com.github.livingwithhippos.unchained_bot.data.model.DownloadItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

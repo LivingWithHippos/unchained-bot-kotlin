@@ -1,7 +1,7 @@
 package com.github.livingwithhippos.unchained_bot.data.repository
 
 import com.github.livingwithhippos.unchained_bot.data.remote.DownloadApiHelper
-import com.github.unchained_bot.unchained.data.model.DownloadItem
+import com.github.livingwithhippos.unchained_bot.data.model.DownloadItem
 
 class DownloadRepository(private val downloadApiHelper: DownloadApiHelper) :
     BaseRepository() {

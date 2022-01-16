@@ -1,4 +1,4 @@
-package com.github.unchained_bot.unchained.data.model
+package com.github.livingwithhippos.unchained_bot.data.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

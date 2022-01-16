@@ -1,6 +1,6 @@
 package com.github.livingwithhippos.unchained_bot.data.remote
 
-import com.github.unchained_bot.unchained.data.model.DownloadItem
+import com.github.livingwithhippos.unchained_bot.data.model.DownloadItem
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
