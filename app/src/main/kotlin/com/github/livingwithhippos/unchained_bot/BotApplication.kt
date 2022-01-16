@@ -181,7 +181,7 @@ class BotApplication : KoinComponent {
                                     if (downloadItem != null) {
                                         val itemMessage: String = "*Name:* ${downloadItem.filename}\n" +
                                                 "*Size:* ${downloadItem.fileSize / 1024 / 1024} MB\n" +
-                                                if (downloadItem.streamable == 1) "*Streaming transcoding available using /transcode ${downloadItem.id}*\n" else "*Streaming not available*\n" +
+                                                (if (downloadItem.streamable == 1) "*Streaming transcoding available using* `/transcode ${downloadItem.id}`\n" else "*Streaming not available*\n") +
                                                         "*Link:* ${downloadItem.download}"
 
                                         bot.sendMessage(
