@@ -50,7 +50,7 @@ class BotApplication : KoinComponent {
     private val logLevelArgument: String = getKoin().getProperty("LOG_LEVEL") ?: "error"
     private val enableQueriesArgument: Boolean = getKoin().getProperty<String>("ENABLE_QUERIES").equals("true", true)
     private val whitelistedUser: Long = getKoin().getProperty<String>("WHITELISTED_USER")?.toLongOrNull() ?: 0
-    private val localeArgument: String = getKoin().getProperty<String>("LOCALE") ?: "en"
+    private val localeArgument: String = getKoin().getProperty("LOCALE") ?: "en"
 
     private val localization: Localization = localeMapping.getOrDefault(localeArgument, EN)
 
@@ -104,10 +104,13 @@ class BotApplication : KoinComponent {
             exitProcess(1)
         }
 
+        printCurrentParameters()
+
         // check temp and downloads folder
         checkAndMakeDirectories(tempPath, downloadsPath)
 
         println("Starting bot...")
+        println("Ignore the retrofit warning")
 
         val bot = bot {
 
@@ -378,6 +381,24 @@ class BotApplication : KoinComponent {
         bot.startPolling()
 
         println(localization.botStarted)
+    }
+
+    private fun printCurrentParameters() {
+        println("""
+            
+            ******************
+            * BOT PARAMETERS *
+            ******************
+        """.trimIndent()
+        )
+        println("Wget arguments: $wgetArguments")
+        println("Log level: $logLevelArgument")
+        println("Queries enabled: $enableQueriesArgument")
+        val hasUser = whitelistedUser > 1000
+        println("Whitelisted user: $hasUser")
+        println("Localization: $localeArgument")
+        println("Temp file path: $tempPath")
+        println("Downloaded files path: $downloadsPath \n")
     }
 
     private fun formatDownloadItem(item: DownloadItem, allowTranscoding: Boolean = false): String {
