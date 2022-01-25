@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
         // fileProperties()
 
         // load properties from environment
-        // todo: use this to load docker env variables, in modules use getProperty("bot_token")?:"default_value" to inject stuff
+        // use this to load docker env variables, use getProperty("bot_token")?:"default_value"
         environmentProperties()
 
         // list all used modules

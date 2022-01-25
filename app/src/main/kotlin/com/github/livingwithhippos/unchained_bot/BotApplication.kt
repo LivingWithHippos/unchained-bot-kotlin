@@ -406,7 +406,6 @@ class BotApplication : KoinComponent {
     private fun printCurrentParameters() {
         println(
             """
-            
             ******************
             * BOT PARAMETERS *
             ******************
