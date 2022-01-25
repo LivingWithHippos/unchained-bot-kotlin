@@ -10,6 +10,7 @@ import com.github.kotlintelegrambot.entities.inlinequeryresults.InlineQueryResul
 import com.github.kotlintelegrambot.entities.inlinequeryresults.InputMessageContent
 import com.github.kotlintelegrambot.extensions.filters.Filter
 import com.github.kotlintelegrambot.logging.LogLevel
+import com.github.livingwithhippos.unchained_bot.data.model.DownloadItem
 import com.github.livingwithhippos.unchained_bot.data.model.Stream
 import com.github.livingwithhippos.unchained_bot.data.model.TorrentItem
 import com.github.livingwithhippos.unchained_bot.data.model.UploadedTorrent
@@ -26,7 +27,6 @@ import com.github.livingwithhippos.unchained_bot.utilities.isMagnet
 import com.github.livingwithhippos.unchained_bot.utilities.isTorrent
 import com.github.livingwithhippos.unchained_bot.utilities.isWebUrl
 import com.github.livingwithhippos.unchained_bot.utilities.runCommand
-import com.github.livingwithhippos.unchained_bot.data.model.DownloadItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,7 +48,8 @@ class BotApplication : KoinComponent {
     private val privateApiKey: String = getKoin().getProperty("PRIVATE_API_KEY") ?: ""
     private val wgetArguments: String = getKoin().getProperty("WGET_ARGUMENTS") ?: "--no-verbose"
     private val logLevelArgument: String = getKoin().getProperty("LOG_LEVEL") ?: "error"
-    private val enableQueriesArgument: Boolean = getKoin().getProperty<String>("ENABLE_QUERIES").equals("true", true)
+    private val enableQuery: String = getKoin().getProperty("ENABLE_QUERIES") ?: "false"
+    private val enableQueriesArgument: Boolean = enableQuery.equals("true", true) || enableQuery == "1"
     private val whitelistedUser: Long = getKoin().getProperty<String>("WHITELISTED_USER")?.toLongOrNull() ?: 0
     private val localeArgument: String = getKoin().getProperty("LOCALE") ?: "en"
 
@@ -344,6 +345,8 @@ class BotApplication : KoinComponent {
                     }
                 }
 
+                // todo: add torrents and magnet support, add downloads and torrents list from the menu as items if the query is empty
+                // decide what to do with authentication, use env variable
                 if (enableQueriesArgument) {
                     // N.B: you need to enable the inlining with BotFather using `/setinline` to use this
                     inlineQuery {
@@ -366,7 +369,24 @@ class BotApplication : KoinComponent {
                                             itemMessage,
                                             parseMode = ParseMode.MARKDOWN
                                         ),
-                                        description = localization.unrestrictDescription
+                                        description = localization.unrestrictDescription,
+                                        url = null
+                                    )
+                                )
+
+                                bot.answerInlineQuery(inlineQuery.id, inlineResults)
+
+                            } else {
+                                val inlineResults = listOf(
+                                    InlineQueryResult.Article(
+                                        id = "1",
+                                        title = localization.error,
+                                        inputMessageContent = InputMessageContent.Text(
+                                            localization.unrestrictError,
+                                            parseMode = ParseMode.MARKDOWN
+                                        ),
+                                        description = localization.unrestrictError,
+                                        url = null
                                     )
                                 )
 
@@ -384,7 +404,8 @@ class BotApplication : KoinComponent {
     }
 
     private fun printCurrentParameters() {
-        println("""
+        println(
+            """
             
             ******************
             * BOT PARAMETERS *

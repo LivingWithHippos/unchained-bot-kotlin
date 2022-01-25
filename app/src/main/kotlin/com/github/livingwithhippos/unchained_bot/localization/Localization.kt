@@ -21,6 +21,7 @@ interface Localization {
     val welcomeMessage: String
     val unrestrict: String
     val unrestrictDescription: String
+    val unrestrictError: String
     val startingDownload: String
     val getDownloadLink: String
     val wrongDownloadSyntax: String
@@ -32,6 +33,7 @@ interface Localization {
     val dashQuality: String
     val liveMP4Quality: String
     val h264WebMQuality: String
+    val error: String
 }
 
 val localeMapping: Map<String, Localization> = mapOf(

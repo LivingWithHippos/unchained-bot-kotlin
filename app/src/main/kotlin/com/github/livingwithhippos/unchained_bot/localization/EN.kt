@@ -50,6 +50,8 @@ object EN : Localization {
         get() = "Unrestrict"
     override val unrestrictDescription: String
         get() = "Unrestrict a single link"
+    override val unrestrictError: String
+        get() = "Error unrestrcting link. Unsupported host?"
     override val startingDownload: String
         get() = "Starting download"
     override val getDownloadLink: String
@@ -72,4 +74,6 @@ object EN : Localization {
         get() = "liveMp4 quality"
     override val h264WebMQuality: String
         get() = "h264WebM quality"
+    override val error: String
+        get() = "Error"
 }
