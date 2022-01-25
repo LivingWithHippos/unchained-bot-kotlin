@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.github.livingwithhippos"
-version = "0.5"
+version = "0.52"
 
 repositories {
     mavenCentral()
