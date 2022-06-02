@@ -289,7 +289,7 @@ class BotApplication : KoinComponent {
                                     args
                                 ).redirectOutput(ProcessBuilder.Redirect.PIPE)
                                     .start()
-                                val reader = process.inputStream.bufferedReader(Charset.defaultCharset())
+                                val reader = process.errorStream.bufferedReader(Charset.defaultCharset())
                                 reader.use {
                                     var line = it.readLine()
                                     while (line != null) {
