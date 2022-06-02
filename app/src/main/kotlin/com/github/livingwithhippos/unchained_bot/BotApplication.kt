@@ -347,9 +347,20 @@ class BotApplication : KoinComponent {
                             downloadRepository.getDownloads(privateApiKey, limit = retrievedDownloads)
                         val stringBuilder = StringBuilder()
                         downloads.forEach {
-                            stringBuilder.append(formatDownloadItem(it))
-                            stringBuilder.appendLine()
-                            stringBuilder.appendLine()
+                            val tempBuffer = StringBuilder()
+                            tempBuffer.append(formatDownloadItem(it))
+                            tempBuffer.appendLine()
+                            tempBuffer.appendLine()
+
+                            if (stringBuilder.length + tempBuffer.length > 4000) {
+                                bot.sendMessage(
+                                    chatId = ChatId.fromId(message.chat.id),
+                                    text = stringBuilder.toString(),
+                                    parseMode = ParseMode.MARKDOWN
+                                )
+                                stringBuilder.clear()
+                            }
+                            stringBuilder.append(tempBuffer)
                         }
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
