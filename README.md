@@ -37,7 +37,7 @@ services:
       # optional
       # only let this user use the bot
       # - WHITELISTED_USER=your telegram user id
-      # add arguments for wget, userd for /download
+      # add arguments for wget, userd for /get
       # - WGET_ARGUMENTS=see https://www.gnu.org/software/wget/manual/wget.html, default is "--no-verbose"
       # OkHttp log level
       # - LOG_LEVEL=availabel options are error, body, basic, headers, none. Default is error
@@ -81,7 +81,7 @@ java \
 -jar unchained-bot-kotlin.jar
 ```
 
-To use the `/download` command you need wget installed.
+To use the `/get` command you need wget installed.
 
 If you don't use docker or already have java installed, this file is just ~ 9 MB. The docker image is around 230 MB.
 
@@ -97,20 +97,20 @@ If you don't use docker or already have java installed, this file is just ~ 9 MB
 | WGET_ARGUMENTS | wget is used to download files locally. Pass arguments to it with this                                                                                              |
 | LOG_LEVEL | default is error, if you have issues you can set this to another level like body, basic, headers, none (currently bugged, do not use)                               |
 | TEMP_PATH | path where temporary files, such are `.torrent` files, are being downloaded. You probably won't change this.                                                        |
-| DOWNLOADS_PATH | the folder where files are downloaded with `/download`. If you're using docker just change the mounted folder instead: `/new/path:/downloads`                       |
+| DOWNLOADS_PATH | the folder where files are downloaded with `/get`. If you're using docker just change the mounted folder instead: `/new/path:/downloads`                            |
 
 ## Available Commands
 
 Parameters between [square brackets] are optional.
 
-| Parameter | Function |
-|---|---|
-| /help | display the list of available commands |
-| /user | get Real Debrid user's information |
-| /torrents [number, default 5] | list the last torrents |
+| Parameter                      | Function |
+|--------------------------------|---|
+| /help                          | display the list of available commands |
+| /user                          | get Real Debrid user's information |
+| /torrents [number, default 5]  | list the last torrents |
 | /downloads [number, default 5] | list the last downloads |
-| /download unrestricted_link | downloads the link on the directory of the server running the bot |
-| /unrestrict url|magnet|torrent file link | generate a download link. Magnet/Torrents will be queued, check their status with /torrents |
+| /get unrestricted_link         | downloads the link on the directory of the server running the bot |
+| /unrestrict url                |magnet|torrent file link | generate a download link. Magnet/Torrents will be queued, check their status with /torrents |
 | /transcode real_debrid_file_id | transcode streaming links to various quality levels. Get the file id using /unrestrict |
 
 ## Thanks, Mr. Unchained

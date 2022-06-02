@@ -26,19 +26,22 @@ import com.github.livingwithhippos.unchained_bot.localization.localeMapping
 import com.github.livingwithhippos.unchained_bot.utilities.isMagnet
 import com.github.livingwithhippos.unchained_bot.utilities.isTorrent
 import com.github.livingwithhippos.unchained_bot.utilities.isWebUrl
-import com.github.livingwithhippos.unchained_bot.utilities.runCommand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.buffer
 import okio.sink
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
+import java.nio.charset.Charset
 import kotlin.system.exitProcess
 
 class BotApplication : KoinComponent {
@@ -51,7 +54,7 @@ class BotApplication : KoinComponent {
     private val enableQuery: String = getKoin().getProperty("ENABLE_QUERIES") ?: "false"
     private val enableQueriesArgument: Boolean = enableQuery.equals("true", true) || enableQuery == "1"
     private val whitelistedUser: Long = getKoin().getProperty<String>("WHITELISTED_USER")?.toLongOrNull() ?: 0
-    private val localeArgument: String = getKoin().getProperty("LOCALE") ?: "en"
+    private val localeArgument: String = getKoin().getProperty<String>("LOCALE") ?: "en"
 
     private val localization: Localization = localeMapping.getOrDefault(localeArgument, EN)
 
@@ -72,6 +75,9 @@ class BotApplication : KoinComponent {
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Default + job)
 
+    private val download = Job()
+    private val downloadScope = CoroutineScope(Dispatchers.IO + download)
+
     // Filters
     // Filter the whitelisted user, if any
     private val userFilter = if (whitelistedUser > 10000) Filter.User(whitelistedUser) else Filter.All
@@ -83,9 +89,7 @@ class BotApplication : KoinComponent {
     private val unrestrictCommandFilter = Filter.Custom { text?.startsWith("/unrestrict") ?: false }
     private val transcodeCommandFilter = Filter.Custom { text?.startsWith("/transcode ") ?: false }
 
-    // more complete check, otherwise text?.startsWith("/download") will also match /downloads
-    // necessary only for commands that have another commands starting with the same characters
-    private val downloadCommandFilter = Filter.Custom { (text?.split("\\s")?.firstOrNull() ?: "") == "/download" }
+    private val getCommandFilter = Filter.Custom { (text?.startsWith("/get") ?: false) }
     private val torrentsCommandFilter = Filter.Custom { text?.startsWith("/torrents") ?: false }
     private val downloadsCommandFilter = Filter.Custom { (text?.startsWith("/downloads") ?: false) }
 
@@ -111,7 +115,6 @@ class BotApplication : KoinComponent {
         checkAndMakeDirectories(tempPath, downloadsPath)
 
         println("Starting bot...")
-        println("Ignore the retrofit warning")
 
         val bot = bot {
 
@@ -269,7 +272,7 @@ class BotApplication : KoinComponent {
                         )
                 }
 
-                message(downloadCommandFilter and userFilter) {
+                message(getCommandFilter and userFilter) {
                     val args = getArgAsString(message.text)
                     // todo: restrict link to real debrid urls?
                     if (!args.isNullOrBlank() && args.isWebUrl()) {
@@ -277,7 +280,31 @@ class BotApplication : KoinComponent {
                             chatId = ChatId.fromId(message.chat.id),
                             text = localization.startingDownload
                         )
-                        "wget -P $downloadsPath $wgetArguments $args".runCommand()
+                        downloadScope.launch {
+                            withContext(Dispatchers.IO) {
+                                val process = ProcessBuilder(
+                                    "wget",
+                                    "-P", downloadsPath,
+                                    wgetArguments,
+                                    args
+                                ).redirectOutput(ProcessBuilder.Redirect.PIPE)
+                                    .start()
+                                val reader = process.errorStream.bufferedReader(Charset.defaultCharset())
+                                reader.use {
+                                    var line = it.readLine()
+                                    while (line != null) {
+                                        println(line)
+                                        line = it.readLine()
+                                        if (line != null)
+                                            bot.sendMessage(
+                                                chatId = ChatId.fromId(message.chat.id),
+                                                text = line
+                                            )
+                                    }
+                                }
+                                process.waitFor()
+                            }
+                        }
                     } else
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
@@ -294,32 +321,46 @@ class BotApplication : KoinComponent {
                         val stringBuilder = StringBuilder()
                         torrents.forEach {
 
-                            stringBuilder.append(
+                            val tempBuffer = StringBuffer()
+
+                            tempBuffer.append(
                                 """
-                                    *${localization.name}:*  ${it.filename}
-                                    *${localization.size}:*  ${it.bytes / 1024 / 1024} MB
-                                    *${localization.status}:*  ${it.status}
-                                    *${localization.progress}:* ${it.progress}%
+                                    ${localization.name}:  ${it.filename}
+                                    ${localization.size}:  ${it.bytes / 1024 / 1024} MB
+                                    ${localization.status}:  ${it.status}
+                                    ${localization.progress}: ${it.progress}%
                                 """.trimIndent()
                             )
-                            stringBuilder.append("\n")
+                            tempBuffer.appendLine()
                             if (it.links.isNotEmpty()) {
                                 if (it.links.size == 1) {
-                                    stringBuilder.append("${localization.getDownloadLink} /unrestrict ${it.links.first()}\n")
+                                    tempBuffer.append("${localization.getDownloadLink}\n/unrestrict ${it.links.first()}\n")
                                 } else {
-                                    stringBuilder.append("${localization.getDownloadLink} /unrestrict +\n")
+                                    tempBuffer.append("${localization.getDownloadLink}\n")
                                     it.links.forEach { link ->
-                                        stringBuilder.append(link)
-                                        stringBuilder.append("\n")
+                                        tempBuffer.append("/unrestrict ")
+                                        tempBuffer.append(link)
+                                        tempBuffer.appendLine()
                                     }
                                 }
                             }
-                            stringBuilder.append("\n")
+                            tempBuffer.appendLine()
+
+                            // if the size of the message is too big send a message and clear the main builder
+                            if (stringBuilder.length + tempBuffer.length > 4000) {
+                                bot.sendMessage(
+                                    chatId = ChatId.fromId(message.chat.id),
+                                    text = stringBuilder.toString(),
+                                    disableWebPagePreview = true
+                                )
+                                stringBuilder.clear()
+                            }
+                            // add the current message to the main builder
+                            stringBuilder.append(tempBuffer)
                         }
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
                             text = stringBuilder.toString(),
-                            parseMode = ParseMode.MARKDOWN,
                             disableWebPagePreview = true
                         )
                     }
@@ -333,9 +374,20 @@ class BotApplication : KoinComponent {
                             downloadRepository.getDownloads(privateApiKey, limit = retrievedDownloads)
                         val stringBuilder = StringBuilder()
                         downloads.forEach {
-                            stringBuilder.append(formatDownloadItem(it))
-                            stringBuilder.appendLine()
-                            stringBuilder.appendLine()
+                            val tempBuffer = StringBuilder()
+                            tempBuffer.append(formatDownloadItem(it))
+                            tempBuffer.appendLine()
+                            tempBuffer.appendLine()
+
+                            if (stringBuilder.length + tempBuffer.length > 4000) {
+                                bot.sendMessage(
+                                    chatId = ChatId.fromId(message.chat.id),
+                                    text = stringBuilder.toString(),
+                                    parseMode = ParseMode.MARKDOWN
+                                )
+                                stringBuilder.clear()
+                            }
+                            stringBuilder.append(tempBuffer)
                         }
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
