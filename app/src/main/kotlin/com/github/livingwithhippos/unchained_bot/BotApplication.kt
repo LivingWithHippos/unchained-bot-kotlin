@@ -304,7 +304,7 @@ class BotApplication : KoinComponent {
                                     ${localization.progress}: ${it.progress}%
                                 """.trimIndent()
                             )
-                            tempBuffer.append("\n")
+                            tempBuffer.appendLine()
                             if (it.links.isNotEmpty()) {
                                 if (it.links.size == 1) {
                                     tempBuffer.append("${localization.getDownloadLink}\n/unrestrict ${it.links.first()}\n")
@@ -313,11 +313,11 @@ class BotApplication : KoinComponent {
                                     it.links.forEach { link ->
                                         tempBuffer.append("/unrestrict ")
                                         tempBuffer.append(link)
-                                        tempBuffer.append("\n")
+                                        tempBuffer.appendLine()
                                     }
                                 }
                             }
-                            tempBuffer.append("\n")
+                            tempBuffer.appendLine()
 
                             // if the size of the message is too big send a message and clear the main builder
                             if (stringBuilder.length + tempBuffer.length > 4000) {
