@@ -109,7 +109,6 @@ class BotApplication : KoinComponent {
         checkAndMakeDirectories(tempPath, downloadsPath)
 
         println("Starting bot...")
-        println("Ignore the retrofit warning")
 
         val bot = bot {
 
