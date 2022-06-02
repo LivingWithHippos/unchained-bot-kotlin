@@ -10,7 +10,7 @@ object EN : Localization {
         /user - get Real Debrid user's information
         /torrents [number, default 5] - list the last torrents
         /downloads [number, default 5] - list the last downloads
-        /download [unrestricted link] - downloads the link on the directory of the server running the bot
+        /get [unrestricted link] - downloads the link on the directory of the server running the bot
         /unrestrict [url|magnet|torrent file link] - generate a download link. Magnet/Torrents will be queued, check their status with /torrents
         /transcode [real debrid file id] - transcode streaming links to various quality levels. Get the file id using /unrestrict
     """.trimIndent()
@@ -57,7 +57,7 @@ object EN : Localization {
     override val getDownloadLink: String
         get() = "Get the download link with"
     override val wrongDownloadSyntax: String
-        get() = "Wrong or missing argument.\nSyntax: /download [unrestricted link]"
+        get() = "Wrong or missing argument.\nSyntax: /get [unrestricted link]"
     override val wrongStreamSyntax: String
         get() = "Wrong or missing argument.\nSyntax: /stream [real debrid file id]"
     override val wrongUnrestrictSyntax: String

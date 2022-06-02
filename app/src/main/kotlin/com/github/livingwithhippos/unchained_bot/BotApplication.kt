@@ -83,9 +83,7 @@ class BotApplication : KoinComponent {
     private val unrestrictCommandFilter = Filter.Custom { text?.startsWith("/unrestrict") ?: false }
     private val transcodeCommandFilter = Filter.Custom { text?.startsWith("/transcode ") ?: false }
 
-    // more complete check, otherwise text?.startsWith("/download") will also match /downloads
-    // necessary only for commands that have another commands starting with the same characters
-    private val downloadCommandFilter = Filter.Custom { (text?.split("\\s")?.firstOrNull() ?: "") == "/download" }
+    private val getCommandFilter = Filter.Custom { (text?.startsWith("/get") ?: false) }
     private val torrentsCommandFilter = Filter.Custom { text?.startsWith("/torrents") ?: false }
     private val downloadsCommandFilter = Filter.Custom { (text?.startsWith("/downloads") ?: false) }
 
@@ -269,7 +267,7 @@ class BotApplication : KoinComponent {
                         )
                 }
 
-                message(downloadCommandFilter and userFilter) {
+                message(getCommandFilter and userFilter) {
                     val args = getArgAsString(message.text)
                     // todo: restrict link to real debrid urls?
                     if (!args.isNullOrBlank() && args.isWebUrl()) {

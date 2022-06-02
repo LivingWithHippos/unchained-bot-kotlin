@@ -10,7 +10,7 @@ object IT : Localization {
         /user - mostra le informazioni utente
         /torrents \[numero, default 5] - mostra la lista degli ultimi n torrent
         /downloads \[numero, default 5] - mostra la lista degli ultimi n download
-        /download \[url] - scarica un url nel server in cui sta girando il bot
+        /get \[url] - scarica un link nel server in cui sta girando il bot
         /unrestrict \[url|magnet|link file torrent] - genera un link di download. Magnet/Torrents verranno messi in coda, controlla il loro status con /torrents
         /transcode \[id file real debrid] - offre codifiche per streaming di varie qualità. Ottieni l'id con /unrestrict
     """.trimIndent()
@@ -57,7 +57,7 @@ object IT : Localization {
     override val getDownloadLink: String
         get() = "Ottieni link per download con"
     override val wrongDownloadSyntax: String
-        get() = "Parametro errato o mancante.\nSintassi: /download [link sbloccato]"
+        get() = "Parametro errato o mancante.\nSintassi: /get [link sbloccato]"
     override val wrongStreamSyntax: String
         get() = "Parametro errato o mancante.\nSintassi: /stream [id file real debrid]"
     override val wrongUnrestrictSyntax: String
