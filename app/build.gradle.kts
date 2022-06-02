@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("kapt") version "1.6.10"
     application
+    id("com.github.ben-manes.versions") version "0.42.0"
 }
 
 group = "com.github.livingwithhippos"
@@ -19,13 +20,13 @@ val ktlint: Configuration by configurations.creating
 dependencies {
 
     val kotlinVersion = "1.6.10"
-    val coroutinesVersion = "1.6.0"
-    val telegramVersion = "6.0.6"
+    val coroutinesVersion = "1.6.2"
+    val telegramVersion = "6.0.7"
     val moshiVersion = "1.13.0"
     val retrofitVersion = "2.9.0"
     val okhttpVersion = "4.9.3"
-    val koinVersion = "3.1.5"
-    val ktLintVersion = "0.43.2"
+    val koinVersion = "3.2.0"
+    val ktLintVersion = "0.45.2"
 
     // kotlin stdlib
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
