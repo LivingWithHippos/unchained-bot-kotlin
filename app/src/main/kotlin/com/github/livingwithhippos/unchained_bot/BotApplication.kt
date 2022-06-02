@@ -294,32 +294,46 @@ class BotApplication : KoinComponent {
                         val stringBuilder = StringBuilder()
                         torrents.forEach {
 
-                            stringBuilder.append(
+                            val tempBuffer = StringBuffer()
+
+                            tempBuffer.append(
                                 """
-                                    *${localization.name}:*  ${it.filename}
-                                    *${localization.size}:*  ${it.bytes / 1024 / 1024} MB
-                                    *${localization.status}:*  ${it.status}
-                                    *${localization.progress}:* ${it.progress}%
+                                    ${localization.name}:  ${it.filename}
+                                    ${localization.size}:  ${it.bytes / 1024 / 1024} MB
+                                    ${localization.status}:  ${it.status}
+                                    ${localization.progress}: ${it.progress}%
                                 """.trimIndent()
                             )
-                            stringBuilder.append("\n")
+                            tempBuffer.append("\n")
                             if (it.links.isNotEmpty()) {
                                 if (it.links.size == 1) {
-                                    stringBuilder.append("${localization.getDownloadLink} /unrestrict ${it.links.first()}\n")
+                                    tempBuffer.append("${localization.getDownloadLink}\n/unrestrict ${it.links.first()}\n")
                                 } else {
-                                    stringBuilder.append("${localization.getDownloadLink} /unrestrict +\n")
+                                    tempBuffer.append("${localization.getDownloadLink}\n")
                                     it.links.forEach { link ->
-                                        stringBuilder.append(link)
-                                        stringBuilder.append("\n")
+                                        tempBuffer.append("/unrestrict ")
+                                        tempBuffer.append(link)
+                                        tempBuffer.append("\n")
                                     }
                                 }
                             }
-                            stringBuilder.append("\n")
+                            tempBuffer.append("\n")
+
+                            // if the size of the message is too big send a message and clear the main builder
+                            if (stringBuilder.length + tempBuffer.length > 4000) {
+                                bot.sendMessage(
+                                    chatId = ChatId.fromId(message.chat.id),
+                                    text = stringBuilder.toString(),
+                                    disableWebPagePreview = true
+                                )
+                                stringBuilder.clear()
+                            }
+                            // add the current message to the main builder
+                            stringBuilder.append(tempBuffer)
                         }
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
                             text = stringBuilder.toString(),
-                            parseMode = ParseMode.MARKDOWN,
                             disableWebPagePreview = true
                         )
                     }
