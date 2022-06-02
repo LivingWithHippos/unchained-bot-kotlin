@@ -26,19 +26,22 @@ import com.github.livingwithhippos.unchained_bot.localization.localeMapping
 import com.github.livingwithhippos.unchained_bot.utilities.isMagnet
 import com.github.livingwithhippos.unchained_bot.utilities.isTorrent
 import com.github.livingwithhippos.unchained_bot.utilities.isWebUrl
-import com.github.livingwithhippos.unchained_bot.utilities.runCommand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.buffer
 import okio.sink
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
+import java.nio.charset.Charset
 import kotlin.system.exitProcess
 
 class BotApplication : KoinComponent {
@@ -71,6 +74,9 @@ class BotApplication : KoinComponent {
     // coroutines
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Default + job)
+
+    private val download = Job()
+    private val downloadScope = CoroutineScope(Dispatchers.IO + download)
 
     // Filters
     // Filter the whitelisted user, if any
@@ -274,7 +280,31 @@ class BotApplication : KoinComponent {
                             chatId = ChatId.fromId(message.chat.id),
                             text = localization.startingDownload
                         )
-                        "wget -P $downloadsPath $wgetArguments $args".runCommand()
+                        downloadScope.launch {
+                            withContext(Dispatchers.IO) {
+                                val process = ProcessBuilder(
+                                    "wget",
+                                    "-P", downloadsPath,
+                                    wgetArguments,
+                                    args
+                                ).redirectOutput(ProcessBuilder.Redirect.PIPE)
+                                    .start()
+                                val reader = process.inputStream.bufferedReader(Charset.defaultCharset())
+                                reader.use {
+                                    var line = it.readLine()
+                                    while (line != null) {
+                                        println(line)
+                                        line = it.readLine()
+                                        if (line != null)
+                                            bot.sendMessage(
+                                                chatId = ChatId.fromId(message.chat.id),
+                                                text = line
+                                            )
+                                    }
+                                }
+                                process.waitFor()
+                            }
+                        }
                     } else
                         bot.sendMessage(
                             chatId = ChatId.fromId(message.chat.id),
