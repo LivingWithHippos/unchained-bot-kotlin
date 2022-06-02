@@ -51,7 +51,7 @@ class BotApplication : KoinComponent {
     private val enableQuery: String = getKoin().getProperty("ENABLE_QUERIES") ?: "false"
     private val enableQueriesArgument: Boolean = enableQuery.equals("true", true) || enableQuery == "1"
     private val whitelistedUser: Long = getKoin().getProperty<String>("WHITELISTED_USER")?.toLongOrNull() ?: 0
-    private val localeArgument: String = getKoin().getProperty("LOCALE") ?: "en"
+    private val localeArgument: String = getKoin().getProperty<String>("LOCALE") ?: "en"
 
     private val localization: Localization = localeMapping.getOrDefault(localeArgument, EN)
 
